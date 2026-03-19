@@ -18,9 +18,9 @@ android {
     signingConfigs {
         create("release") {
             storeFile     = file(System.getenv("SIGNING_STORE_FILE") ?: "${rootProject.projectDir}/greengo.jks")
-            storePassword = System.getenv("SIGNING_STORE_PASSWORD") ?: "greengo123"
-            keyAlias      = System.getenv("SIGNING_KEY_ALIAS") ?: "greengo"
-            keyPassword   = System.getenv("SIGNING_KEY_PASSWORD") ?: "greengo123"
+            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "greengo123"
+            keyAlias      = System.getenv("KEY_ALIAS") ?: "greengo"
+            keyPassword   = System.getenv("KEY_PASSWORD") ?: "greengo123"
         }
     }
 

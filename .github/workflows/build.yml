@@ -44,9 +44,9 @@ jobs:
         run: ./gradlew assembleRelease
         env:
           SIGNING_STORE_FILE: ${{ github.workspace }}/greengo.jks
-          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
-          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
-          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - name: Rename APK
         run: cp app/build/outputs/apk/release/app-release.apk GreenGo.apk
