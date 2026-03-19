@@ -30,8 +30,7 @@ import com.greengo.app.ui.components.WindowSize
 @Composable
 fun AboutScreen(vm: AppStateViewModel) {
     val theme by vm.theme.collectAsState()
-    val ws = rememberWindowSize()
-    val context = LocalContext.current
+        val context = LocalContext.current
 
     val sections = listOf(
         "What is Green Go?" to listOf(

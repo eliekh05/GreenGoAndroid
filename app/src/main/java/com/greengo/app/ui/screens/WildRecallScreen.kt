@@ -206,8 +206,7 @@ fun WildRecallScreen(vm: AppStateViewModel) {
 
 @Composable
 private fun MemCardView(card: MemCard, theme: AppTheme, onClick: () -> Unit) {
-    val ws = rememberWindowSize()
-    val context = LocalContext.current
+        val context = LocalContext.current
     val faceResId = remember(card.imgName) {
         context.resources.getIdentifier(card.imgName, "drawable", context.packageName)
     }

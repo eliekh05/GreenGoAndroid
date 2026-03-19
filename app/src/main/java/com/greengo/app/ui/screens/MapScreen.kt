@@ -28,6 +28,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.greengo.app.data.AppStateViewModel
 import com.greengo.app.data.Screen
 import com.greengo.app.ui.components.BackBtn
+import com.greengo.app.ui.components.WindowSize
+import com.greengo.app.ui.components.rememberWindowSize
 import com.greengo.app.ui.components.GreenPrimary
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -216,8 +218,7 @@ private suspend fun geocode(query: String): Pair<Double, Double>? =
 
 @Composable
 fun MapScreen(vm: AppStateViewModel) {
-    val ws = rememberWindowSize()
-    val theme   by vm.theme.collectAsState()
+        val theme   by vm.theme.collectAsState()
     val context  = LocalContext.current
     val scope    = rememberCoroutineScope()
 
@@ -694,8 +695,7 @@ private fun DetailRow(emoji: String, text: String) {
 
 @Composable
 fun MapInfoScreen(vm: AppStateViewModel) {
-    val ws = rememberWindowSize()
-    val theme by vm.theme.collectAsState()
+        val theme by vm.theme.collectAsState()
 
     Column(
         modifier = Modifier

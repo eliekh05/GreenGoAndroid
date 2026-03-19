@@ -88,8 +88,7 @@ private fun sanitize(raw: String): String {
 @Composable
 fun ContactScreen(vm: AppStateViewModel) {
     val theme by vm.theme.collectAsState()
-    val ws = rememberWindowSize()
-    val context = LocalContext.current
+        val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     var emailText   by remember { mutableStateOf("") }

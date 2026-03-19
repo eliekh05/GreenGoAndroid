@@ -111,8 +111,7 @@ class PedometerManager(context: Context) {
 
 @Composable
 fun PedometerScreen(vm: AppStateViewModel) {
-    val ws = rememberWindowSize()
-    val theme = vm.theme.collectAsState().value
+        val theme = vm.theme.collectAsState().value
     val context = LocalContext.current
 
     val pedo = remember { PedometerManager(context) }

@@ -33,8 +33,7 @@ import com.greengo.app.ui.components.WindowSize
 
 @Composable
 fun GamesScreen(vm: AppStateViewModel) {
-    val ws = rememberWindowSize()
-    val theme       by vm.theme.collectAsState()
+        val theme       by vm.theme.collectAsState()
     val memoryScore by vm.memoryScore.collectAsState()
     val oceanScore  by vm.oceanScore.collectAsState()
     val triviaScore by vm.triviaScore.collectAsState()
@@ -111,8 +110,7 @@ private fun GameCard(
     theme: AppTheme,
     onClick: () -> Unit
 ) {
-    val ws = rememberWindowSize()
-    val context = LocalContext.current
+        val context = LocalContext.current
     val imageResId = remember(bannerImage) {
         context.resources.getIdentifier(bannerImage, "drawable", context.packageName)
     }
@@ -168,8 +166,7 @@ private fun GameCard(
 @Composable
 fun MemoryInfoScreen(vm: AppStateViewModel) {
     val theme by vm.theme.collectAsState()
-    val ws = rememberWindowSize()
-    val context = LocalContext.current
+        val context = LocalContext.current
 
     val facts = listOf(
         "a1" to "Cheetahs are harmed by habitat fragmentation and illegal wildlife tourism.",

@@ -107,8 +107,7 @@ private suspend fun mlkitTranslate(text: String, targetLang: String): String =
 @Composable
 fun TranslatorScreen(vm: AppStateViewModel) {
     val theme by vm.theme.collectAsState()
-    val ws = rememberWindowSize()
-    val context = LocalContext.current
+        val context = LocalContext.current
     val scope   = rememberCoroutineScope()
 
     var inputText      by remember { mutableStateOf("") }

@@ -21,6 +21,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.greengo.app.ui.components.WindowSize
+import com.greengo.app.ui.components.rememberWindowSize
 import com.greengo.app.data.AppStateViewModel
 import com.greengo.app.data.AppTheme
 import com.greengo.app.data.Screen
@@ -34,8 +36,7 @@ import com.greengo.app.data.allTriviaQuestions
 
 @Composable
 fun TriviaScreen(vm: AppStateViewModel) {
-    val ws = rememberWindowSize()
-    val theme by vm.theme.collectAsState()
+        val theme by vm.theme.collectAsState()
 
     // Game state — rebuilt on each new game (matching iOS buildGame())
     var questions    by remember { mutableStateOf<List<TriviaQuestion>>(emptyList()) }
@@ -184,8 +185,7 @@ private fun AnswerCard(
     theme: AppTheme,
     onClick: () -> Unit
 ) {
-    val ws = rememberWindowSize()
-    val context = LocalContext.current
+        val context = LocalContext.current
     val resId = remember(ans.imageName) {
         context.resources.getIdentifier(ans.imageName, "drawable", context.packageName)
     }

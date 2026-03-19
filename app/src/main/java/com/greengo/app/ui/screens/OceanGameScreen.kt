@@ -180,8 +180,7 @@ class ReefRescuersGame {
 
 @Composable
 fun OceanGameScreen(vm: AppStateViewModel) {
-    val ws = rememberWindowSize()
-    val theme = vm.theme.collectAsState().value
+        val theme = vm.theme.collectAsState().value
     val game  = remember { ReefRescuersGame() }
     val density = LocalDensity.current
 
@@ -407,8 +406,7 @@ private fun BinSpriteView(sprite: OceanSprite, context: android.content.Context)
 @Composable
 fun OceanInfoScreen(vm: AppStateViewModel) {
     val theme by vm.theme.collectAsState()
-    val ws = rememberWindowSize()
-    val context = LocalContext.current
+        val context = LocalContext.current
     var skip by remember { mutableStateOf(false) }
 
     val iconResId = remember {
