@@ -37,7 +37,7 @@ jobs:
       - name: Build release APK
         run: ./gradlew assembleRelease --no-daemon
         env:
-          RELEASE_STORE_FILE: greengo.keystore
+          RELEASE_STORE_FILE: app/greengo.keystore
           RELEASE_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           RELEASE_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
