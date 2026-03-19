@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run SonarCloud analysis
-        uses: SonarSource/sonarqube-scan-action@vX
+        uses: SonarSource/sonarqube-scan-action@v2.1.0
         env:
          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
