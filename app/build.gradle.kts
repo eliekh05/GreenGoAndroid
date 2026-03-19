@@ -1,3 +1,7 @@
+plugins {
+    id("com.android.application")
+}
+
 android {
     namespace   = "com.greengo.app"
     compileSdk  = 35
