@@ -3,16 +3,10 @@ name: Build GreenGo APK
 on:
   push:
     branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout code
@@ -21,32 +15,47 @@ jobs:
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '21'
-          cache: 'gradle'
+          distribution: temurin
+          java-version: 21
+          cache: gradle
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: '8.9'
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      # 🔐 Decode keystore (REQUIRED for signed APK)
+      - name: Decode keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > greengo.keystore
+
+      # 🔨 Build signed release APK
       - name: Build release APK
-        run: ./gradlew assembleRelease --no-daemon --stacktrace
+        run: ./gradlew assembleRelease --no-daemon
+        env:
+          RELEASE_STORE_FILE: greengo.keystore
+          RELEASE_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
-      - name: Rename APK to GreenGo.apk
-        run: cp app/build/outputs/apk/release/app-release-unsigned.apk GreenGo.apk
+      # ✅ Use the CORRECT signed APK
+      - name: Rename APK
+        run: cp app/build/outputs/apk/release/app-release.apk GreenGo.apk
 
-      - name: Publish to GitHub Releases
+      - name: Verify APK exists
+        run: test -f GreenGo.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GreenGo APK
+          path: GreenGo.apk
+
+      - name: Create Release
+        if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.${{ github.run_number }}
-          name: GreenGo v1.0.${{ github.run_number }}
           files: GreenGo.apk
-          body: |
-            Download **GreenGo.apk** below, transfer to your Android phone, and tap to install.
-            Allow "Install from unknown sources" if prompted.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
