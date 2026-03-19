@@ -17,13 +17,12 @@ android {
 
     signingConfigs {
     create("release") {
-        storeFile = file(System.getenv("ORG_GRADLE_PROJECT_STOREFILE")!!)
+        storeFile = file(System.getenv("ORG_GRADLE_PROJECT_STOREFILE"))
         storePassword = System.getenv("ORG_GRADLE_PROJECT_STOREPASSWORD")
         keyAlias = System.getenv("ORG_GRADLE_PROJECT_KEYALIAS")
         keyPassword = System.getenv("ORG_GRADLE_PROJECT_KEYPASSWORD")
     }
 }
-
     buildTypes {
         release {
             isMinifyEnabled = false
