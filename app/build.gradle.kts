@@ -17,14 +17,10 @@ android {
 
     signingConfigs {
         create("release") {
-            val sf = System.getenv("SIGNING_STORE_FILE")
-            storeFile     = file(if (!sf.isNullOrEmpty()) sf else "${rootProject.projectDir}/greengo.jks")
-            val kp = System.getenv("KEYSTORE_PASSWORD")
-            storePassword = if (!kp.isNullOrEmpty()) kp else "greengo123"
-            val ka = System.getenv("KEY_ALIAS")
-            keyAlias      = if (!ka.isNullOrEmpty()) ka else "greengo"
-            val kpwd = System.getenv("KEY_PASSWORD")
-            keyPassword   = if (!kpwd.isNullOrEmpty()) kpwd else "greengo123"
+            storeFile     = file("${rootProject.projectDir}/greengo-release.jks")
+            storePassword = "greengo123"
+            keyAlias      = "release"
+            keyPassword   = "greengo123"
         }
     }
 
