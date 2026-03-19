@@ -18,7 +18,7 @@ android {
     signingConfigs {
     create("release") {
         // Use environment variables, fallback to local file if needed
-        storeFile     = file(System.getenv("ORG_GRADLE_PROJECT_STOREFILE") ?: "${rootProject.projectDir}/greengo-release.jks")
+        storeFile     = file(System.getenv("ORG_GRADLE_PROJECT_STOREFILE") ?: "${rootProject.projectDir}/greengo.jks")
         storePassword = System.getenv("ORG_GRADLE_PROJECT_STOREPASSWORD") ?: "greengo123"
         keyAlias      = System.getenv("ORG_GRADLE_PROJECT_KEYALIAS") ?: "release"
         keyPassword   = System.getenv("ORG_GRADLE_PROJECT_KEYPASSWORD") ?: "greengo123"
