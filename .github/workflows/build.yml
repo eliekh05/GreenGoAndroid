@@ -31,7 +31,7 @@ jobs:
 
       # 5️⃣ Decode the keystore from secrets
       - name: Decode keystore
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > greengo.keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/greengo.keystore
 
       # 6️⃣ Build the signed release APK
       - name: Build release APK
