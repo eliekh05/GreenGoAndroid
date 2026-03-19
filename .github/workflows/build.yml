@@ -9,9 +9,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout the code
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 2️⃣ Set up JDK 21
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -19,17 +21,19 @@ jobs:
           java-version: 21
           cache: gradle
 
+      # 3️⃣ Set up Gradle
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
+      # 4️⃣ Make gradlew executable
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # 🔐 Decode the keystore
+      # 5️⃣ Decode the keystore from secrets
       - name: Decode keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > greengo.keystore
 
-      # 🔨 Build signed release APK
+      # 6️⃣ Build the signed release APK
       - name: Build release APK
         run: ./gradlew assembleRelease --no-daemon
         env:
@@ -38,45 +42,22 @@ jobs:
           RELEASE_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
-      # ✅ Rename APK
+      # 7️⃣ Rename APK to a simple name
       - name: Rename APK
         run: cp app/build/outputs/apk/release/app-release.apk GreenGo.apk
 
+      # 8️⃣ Verify APK exists
       - name: Verify APK exists
         run: test -f GreenGo.apk
 
-      # 🗂 Upload as artifact so you can download & test
+      # 9️⃣ Upload artifact (downloadable from Actions)
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: GreenGo APK
           path: GreenGo.apk
 
-      # 🏷 Optional: Create GitHub release automatically
-      - name: Create Release
-        if: github.ref == 'refs/heads/main'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v1.0.${{ github.run_number }}
-          files: GreenGo.apk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}          RELEASE_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          RELEASE_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-
-      # ✅ Use the CORRECT signed APK
-      - name: Rename APK
-        run: cp app/build/outputs/apk/release/app-release.apk GreenGo.apk
-
-      - name: Verify APK exists
-        run: test -f GreenGo.apk
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: GreenGo APK
-          path: GreenGo.apk
-
+      # 🔟 Optional: Create GitHub Release automatically
       - name: Create Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
