@@ -1,11 +1,7 @@
 package com.greengo.app.ui.components
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
 import kotlin.math.roundToInt
 
 // ─────────────────────────────────────────────────────────────────────────────
