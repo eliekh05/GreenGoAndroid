@@ -44,7 +44,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run SonarCloud analysis
-        run: ./gradlew sonarqube \
+        run: ./gradlew \
                -Dsonar.projectKey=GreenGoAndroid \
                -Dsonar.organization=eliekh05_GreenGoAndroid \
                -Dsonar.host.url=https://sonarcloud.io \
