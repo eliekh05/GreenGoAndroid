@@ -31,12 +31,10 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Run SonarCloud analysis
-        run: ./gradlew sonarqube \
-         -Dsonar.projectKey=eliekh05_GreenGoAndroid \
-         -Dsonar.organization=eliekh05 \
-         -Dsonar.host.url=https://sonarcloud.io \
-         -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Build release APK
         run: ./gradlew assembleRelease
