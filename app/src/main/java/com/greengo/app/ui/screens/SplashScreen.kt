@@ -5,6 +5,9 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.ViewGroup
 import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.material.icons.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.media3.common.AudioAttributes

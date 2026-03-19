@@ -11,6 +11,7 @@ import androidx.compose.ui.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.foundation.text.*
 import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.input.KeyboardType
 import com.greengo.app.data.AppStateViewModel
 import com.greengo.app.data.Screen
 import com.greengo.app.ui.components.NavBar

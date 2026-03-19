@@ -1,6 +1,8 @@
 package com.greengo.app.ui.components
 
 import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.ui.*
 import kotlin.math.roundToInt
 import androidx.compose.animation.*

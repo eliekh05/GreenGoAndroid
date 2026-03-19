@@ -2,6 +2,8 @@ package com.greengo.app.data
 
 import java.util.UUID
 import androidx.compose.animation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.ui.draw.*
