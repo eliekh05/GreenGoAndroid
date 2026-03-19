@@ -1,0 +1,27 @@
+# Built outputs
+/build/
+app/build/
+
+# Gradle
+.gradle/
+gradle-wrapper.jar
+local.properties
+
+# Android Studio
+*.iml
+.idea/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Keys — never commit signing keystores
+*.jks
+*.keystore
+
+# macOS
+.DS_Store
+**/.DS_Store
+__MACOSX/
+
+# Logs
+*.log
