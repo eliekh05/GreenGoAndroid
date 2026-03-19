@@ -33,11 +33,19 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Decode keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > ${{ github.workspace }}/app/greengo.keystore
+
       - name: Build release APK
         run: ./gradlew assembleRelease --no-daemon --stacktrace
+        env:
+          RELEASE_STORE_FILE: ${{ github.workspace }}/app/greengo.keystore
+          RELEASE_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - name: Rename APK to GreenGo.apk
-        run: cp app/build/outputs/apk/release/app-release-unsigned.apk GreenGo.apk
+        run: cp app/build/outputs/apk/release/app-release.apk GreenGo.apk
 
       - name: Verify APK exists
         run: test -f GreenGo.apk && echo "APK ready" || (echo "APK missing" && exit 1)
