@@ -24,6 +24,7 @@ import com.greengo.app.ui.components.WindowSize
 
 @Composable
 fun PreferencesScreen(vm: AppStateViewModel) {
+        val ws = rememberWindowSize()
         val theme       by vm.theme.collectAsState()
     val triviaScore by vm.triviaScore.collectAsState()
     val memoryScore by vm.memoryScore.collectAsState()
@@ -144,6 +145,7 @@ fun PreferencesScreen(vm: AppStateViewModel) {
 
 @Composable
 fun SettingsScreen(vm: AppStateViewModel) {
+        val ws = rememberWindowSize()
         val theme       by vm.theme.collectAsState()
     val triviaScore by vm.triviaScore.collectAsState()
     val memoryScore by vm.memoryScore.collectAsState()

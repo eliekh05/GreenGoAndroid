@@ -218,6 +218,7 @@ private suspend fun geocode(query: String): Pair<Double, Double>? =
 
 @Composable
 fun MapScreen(vm: AppStateViewModel) {
+        val ws = rememberWindowSize()
         val theme   by vm.theme.collectAsState()
     val context  = LocalContext.current
     val scope    = rememberCoroutineScope()
@@ -695,6 +696,7 @@ private fun DetailRow(emoji: String, text: String) {
 
 @Composable
 fun MapInfoScreen(vm: AppStateViewModel) {
+        val ws = rememberWindowSize()
         val theme by vm.theme.collectAsState()
 
     Column(
