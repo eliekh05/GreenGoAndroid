@@ -23,7 +23,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
         with:
-          gradle-version: '8.9'
+          gradle-version: '9.1.0'
           
       - name: Make gradlew executable
         run: chmod +x ./gradlew
