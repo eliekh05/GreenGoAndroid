@@ -4,6 +4,7 @@ app/build/
 
 # Gradle
 .gradle/
+gradle-wrapper.jar
 local.properties
 
 # Android Studio
