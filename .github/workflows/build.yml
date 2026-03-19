@@ -38,10 +38,15 @@ jobs:
 
       - name: Decode keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > $GITHUB_WORKSPACE/greengo-release.jks
+         echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > $GITHUB_WORKSPACE/greengo-release.jks
 
       - name: Build release APK
         run: ./gradlew assembleRelease
+        env:
+          ORG_GRADLE_PROJECT_STOREFILE: $GITHUB_WORKSPACE/greengo-release.jks
+          ORG_GRADLE_PROJECT_STOREPASSWORD: ${{ secrets.KEYSTOREPASSWORD }}
+          ORG_GRADLE_PROJECT_KEYALIAS: ${{ secrets.KEYALIAS }}
+          ORG_GRADLE_PROJECT_KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
 
       - name: Rename APK
         run: cp app/build/outputs/apk/release/app-release.apk GreenGo.apk
