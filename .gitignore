@@ -14,9 +14,8 @@ captures/
 .externalNativeBuild/
 .cxx/
 
-# Keys — never commit signing keystores
-*.jks
-*.keystore
+# Keys
+# *.jks  # greengo-release.jks is intentionally committed
 
 # macOS
 .DS_Store
