@@ -24,8 +24,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: '8.9'
-          cache-disabled: true
-          gradle-home-cache-cleanup: true
           
       - name: Make gradlew executable
         run: chmod +x ./gradlew
