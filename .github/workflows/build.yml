@@ -22,7 +22,7 @@ jobs:
         with:
           args: >
            -Dsonar.organization=eliekh05
-           -Dsonar.projectKey=GreenGoAndroid
+           -Dsonar.projectKey=eliekh05_GreenGoAndroid
            -Dsonar.sources=.
            -Dsonar.host.url=https://sonarcloud.io
 
