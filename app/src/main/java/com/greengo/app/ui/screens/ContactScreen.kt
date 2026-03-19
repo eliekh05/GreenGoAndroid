@@ -276,7 +276,7 @@ private fun ContactField(
             modifier = Modifier.fillMaxWidth().shadow(3.dp, RoundedCornerShape(10.dp)),
             keyboardOptions = KeyboardOptions(
                 keyboardType = keyboardType,
-                autoCorrect = false,
+                autoCorrectEnabled = false,
                 capitalization = if (keyboardType == KeyboardType.Email)
                     KeyboardCapitalization.None else KeyboardCapitalization.Sentences
             ),
