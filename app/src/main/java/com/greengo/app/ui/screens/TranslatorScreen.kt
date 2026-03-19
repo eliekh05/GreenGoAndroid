@@ -16,76 +16,97 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.text.font.*
-import com.google.mlkit.common.model.DownloadConditions
-import com.google.mlkit.nl.translate.TranslateLanguage
-import com.google.mlkit.nl.translate.Translation
-import com.google.mlkit.nl.translate.TranslatorOptions
 import com.greengo.app.data.AppStateViewModel
 import com.greengo.app.data.Screen
 import com.greengo.app.ui.components.NavBar
 import com.greengo.app.ui.components.rememberWindowSize
 import com.greengo.app.ui.components.WindowSize
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 import java.util.Locale
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MARK: - Language list  (mirrors iOS TranslatorEngine.languages)
-// Uses ML Kit TranslateLanguage codes.
+// MARK: - Google Cloud Translate API key
+// Replace with your actual API key from Google Cloud Console
 // ─────────────────────────────────────────────────────────────────────────────
 
-private data class LangEntry(val name: String, val mlkitCode: String, val bcp47: String)
+private const val GOOGLE_TRANSLATE_API_KEY = "YOUR_GOOGLE_TRANSLATE_API_KEY"
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MARK: - Language list
+// Uses BCP-47 language codes for Google Translate API
+// ─────────────────────────────────────────────────────────────────────────────
+
+private data class LangEntry(val name: String, val googleCode: String, val bcp47: String)
 
 private val languages = listOf(
-    LangEntry("Arabic",              TranslateLanguage.ARABIC,      "ar-SA"),
-    LangEntry("Chinese Simplified",  TranslateLanguage.CHINESE,     "zh-CN"),
-    LangEntry("Dutch",               TranslateLanguage.DUTCH,       "nl-NL"),
-    LangEntry("French",              TranslateLanguage.FRENCH,      "fr-FR"),
-    LangEntry("German",              TranslateLanguage.GERMAN,      "de-DE"),
-    LangEntry("Indonesian",          TranslateLanguage.INDONESIAN,  "id-ID"),
-    LangEntry("Italian",             TranslateLanguage.ITALIAN,     "it-IT"),
-    LangEntry("Japanese",            TranslateLanguage.JAPANESE,    "ja-JP"),
-    LangEntry("Korean",              TranslateLanguage.KOREAN,      "ko-KR"),
-    LangEntry("Polish",              TranslateLanguage.POLISH,      "pl-PL"),
-    LangEntry("Portuguese",          TranslateLanguage.PORTUGUESE,  "pt-BR"),
-    LangEntry("Russian",             TranslateLanguage.RUSSIAN,     "ru-RU"),
-    LangEntry("Spanish",             TranslateLanguage.SPANISH,     "es-ES"),
-    LangEntry("Thai",                TranslateLanguage.THAI,        "th-TH"),
-    LangEntry("Turkish",             TranslateLanguage.TURKISH,     "tr-TR"),
-    LangEntry("Ukrainian",           TranslateLanguage.UKRAINIAN,   "uk-UA"),
-    LangEntry("Vietnamese",          TranslateLanguage.VIETNAMESE,  "vi-VN")
+    LangEntry("Arabic",              "ar",    "ar-SA"),
+    LangEntry("Chinese Simplified",  "zh-CN", "zh-CN"),
+    LangEntry("Chinese Traditional", "zh-TW", "zh-TW"),
+    LangEntry("Czech",               "cs",    "cs-CZ"),
+    LangEntry("Danish",              "da",    "da-DK"),
+    LangEntry("Dutch",               "nl",    "nl-NL"),
+    LangEntry("Finnish",             "fi",    "fi-FI"),
+    LangEntry("French",              "fr",    "fr-FR"),
+    LangEntry("German",              "de",    "de-DE"),
+    LangEntry("Greek",               "el",    "el-GR"),
+    LangEntry("Hebrew",              "iw",    "he-IL"),
+    LangEntry("Hindi",               "hi",    "hi-IN"),
+    LangEntry("Hungarian",           "hu",    "hu-HU"),
+    LangEntry("Indonesian",          "id",    "id-ID"),
+    LangEntry("Italian",             "it",    "it-IT"),
+    LangEntry("Japanese",            "ja",    "ja-JP"),
+    LangEntry("Korean",              "ko",    "ko-KR"),
+    LangEntry("Malay",               "ms",    "ms-MY"),
+    LangEntry("Norwegian",           "no",    "no-NO"),
+    LangEntry("Persian",             "fa",    "fa-IR"),
+    LangEntry("Polish",              "pl",    "pl-PL"),
+    LangEntry("Portuguese",          "pt",    "pt-BR"),
+    LangEntry("Romanian",            "ro",    "ro-RO"),
+    LangEntry("Russian",             "ru",    "ru-RU"),
+    LangEntry("Spanish",             "es",    "es-ES"),
+    LangEntry("Swedish",             "sv",    "sv-SE"),
+    LangEntry("Thai",                "th",    "th-TH"),
+    LangEntry("Turkish",             "tr",    "tr-TR"),
+    LangEntry("Ukrainian",           "uk",    "uk-UA"),
+    LangEntry("Vietnamese",          "vi",    "vi-VN")
 )
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MARK: - MLKit translate suspend helper
+// MARK: - Google Cloud Translate REST helper
 // ─────────────────────────────────────────────────────────────────────────────
 
-private suspend fun mlkitTranslate(text: String, targetLang: String): String =
-    suspendCancellableCoroutine { cont ->
-        val options = TranslatorOptions.Builder()
-            .setSourceLanguage(TranslateLanguage.ENGLISH)
-            .setTargetLanguage(targetLang)
-            .build()
-        val translator = Translation.getClient(options)
-        val conditions = DownloadConditions.Builder().requireWifi().build()
-        translator.downloadModelIfNeeded(conditions)
-            .addOnSuccessListener {
-                translator.translate(text)
-                    .addOnSuccessListener { result ->
-                        translator.close()
-                        if (cont.isActive) cont.resume(result)
-                    }
-                    .addOnFailureListener { e ->
-                        translator.close()
-                        if (cont.isActive) cont.resumeWithException(e)
-                    }
-            }
-            .addOnFailureListener { e ->
-                translator.close()
-                if (cont.isActive) cont.resumeWithException(e)
-            }
+private val httpClient = OkHttpClient()
+
+private suspend fun googleTranslate(text: String, targetLang: String): String =
+    withContext(Dispatchers.IO) {
+        val url = "https://translation.googleapis.com/language/translate/v2?key=$GOOGLE_TRANSLATE_API_KEY"
+        val json = JSONObject().apply {
+            put("q", text)
+            put("source", "en")
+            put("target", targetLang)
+            put("format", "text")
+        }
+        val body = json.toString().toRequestBody("application/json".toMediaType())
+        val request = Request.Builder().url(url).post(body).build()
+        val response = httpClient.newCall(request).execute()
+        val responseBody = response.body?.string() ?: throw Exception("Empty response")
+        if (!response.isSuccessful) {
+            val errObj = runCatching { JSONObject(responseBody).getJSONObject("error").getString("message") }
+                .getOrDefault("HTTP ${response.code}")
+            throw Exception("Translate error: $errObj")
+        }
+        val result = JSONObject(responseBody)
+        result.getJSONObject("data")
+            .getJSONArray("translations")
+            .getJSONObject(0)
+            .getString("translatedText")
     }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -96,7 +117,7 @@ private suspend fun mlkitTranslate(text: String, targetLang: String): String =
 fun TranslatorScreen(vm: AppStateViewModel) {
     val ws = rememberWindowSize()
     val theme by vm.theme.collectAsState()
-        val context = LocalContext.current
+    val context = LocalContext.current
     val scope   = rememberCoroutineScope()
 
     var inputText      by remember { mutableStateOf("") }
@@ -143,11 +164,10 @@ fun TranslatorScreen(vm: AppStateViewModel) {
                     val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                     inputText = matches?.firstOrNull() ?: inputText
                     isListening = false
-                    // Auto-translate after recognition (mirrors iOS behaviour)
                     if (inputText.isNotBlank()) {
                         isTranslating = true; errorMessage = null; translatedText = ""
                         scope.launch {
-                            runCatching { mlkitTranslate(inputText.trim(), currentLang.mlkitCode) }
+                            runCatching { googleTranslate(inputText.trim(), currentLang.googleCode) }
                                 .onSuccess { result ->
                                     translatedText = result
                                     isTranslating = false
@@ -189,7 +209,7 @@ fun TranslatorScreen(vm: AppStateViewModel) {
         val q = inputText.trim(); if (q.isEmpty()) return
         isTranslating = true; errorMessage = null; translatedText = ""; stopSpeaking()
         scope.launch {
-            runCatching { mlkitTranslate(q, currentLang.mlkitCode) }
+            runCatching { googleTranslate(q, currentLang.googleCode) }
                 .onSuccess { result ->
                     translatedText = result
                     isTranslating = false
@@ -202,7 +222,7 @@ fun TranslatorScreen(vm: AppStateViewModel) {
         }
     }
 
-    val accentBlue  = Color(red = 0.05f, green = 0.38f, blue = 0.82f)
+    val accentBlue   = Color(red = 0.05f, green = 0.38f, blue = 0.82f)
     val accentPurple = Color(red = 0.45f, green = 0.20f, blue = 0.75f)
 
     Scaffold(
@@ -228,8 +248,8 @@ fun TranslatorScreen(vm: AppStateViewModel) {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text("Translate to", fontSize = ws.captionSp.sp, color = theme.mutedText)
                 ExposedDropdownMenuLanguagePicker(
-                    selectedIndex  = selectedIndex,
-                    onSelect       = { idx ->
+                    selectedIndex = selectedIndex,
+                    onSelect = { idx ->
                         selectedIndex  = idx
                         translatedText = ""
                         errorMessage   = null
