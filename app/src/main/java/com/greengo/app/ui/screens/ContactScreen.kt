@@ -264,7 +264,7 @@ private fun ContactField(
     placeholder: String,
     value: String,
     onValueChange: (String) -> Unit,
-    keyboardType: KeyboardType = KeyboardType.Default,
+    keyboardType: androidx.compose.ui.text.input.KeyboardType = androidx.compose.ui.text.input.KeyboardType.Text,
     theme: com.greengo.app.data.AppTheme
 ) {
     val ws = rememberWindowSize()
