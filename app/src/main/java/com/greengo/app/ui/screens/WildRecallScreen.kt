@@ -32,6 +32,7 @@ import com.greengo.app.data.Screen
 import com.greengo.app.ui.components.GreenPrimary
 import com.greengo.app.ui.components.rememberWindowSize
 import com.greengo.app.ui.components.WindowSize
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import java.util.UUID
 
@@ -205,6 +206,7 @@ fun WildRecallScreen(vm: AppStateViewModel) {
 
 @Composable
 private fun MemCardView(card: MemCard, theme: AppTheme, onClick: () -> Unit) {
+    val ws = rememberWindowSize()
     val context = LocalContext.current
     val faceResId = remember(card.imgName) {
         context.resources.getIdentifier(card.imgName, "drawable", context.packageName)
@@ -280,6 +282,7 @@ private fun WinOverlay(
     onPlayAgain: () -> Unit,
     onGames: () -> Unit
 ) {
+    val ws = rememberWindowSize()
     Box(
         modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.55f)),
         contentAlignment = Alignment.Center
@@ -322,6 +325,7 @@ private fun WinOverlay(
 
 @Composable
 private fun WildRecallNavBar(theme: AppTheme, onBack: () -> Unit, onHome: () -> Unit) {
+    val ws = rememberWindowSize()
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
@@ -336,7 +340,7 @@ private fun WildRecallNavBar(theme: AppTheme, onBack: () -> Unit, onHome: () -> 
                     tint = theme.text, modifier = Modifier.size(ws.smallIconSize))
             }
             Spacer(modifier = Modifier.weight(1f))
-            Text("Wild Recall", fontSize = ws.headingSize.sp, fontWeight = FontWeight.ExtraBold, color = theme.accent)
+            Text("Wild Recall", fontSize = ws.headingSp.sp, fontWeight = FontWeight.ExtraBold, color = theme.accent)
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = onHome, modifier = Modifier.size(ws.navIconSize)) {
                 Icon(Icons.Default.Home, contentDescription = "Home",

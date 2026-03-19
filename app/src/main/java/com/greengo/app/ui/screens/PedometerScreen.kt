@@ -111,6 +111,7 @@ class PedometerManager(context: Context) {
 
 @Composable
 fun PedometerScreen(vm: AppStateViewModel) {
+    val ws = rememberWindowSize()
     val theme = vm.theme.collectAsState().value
     val context = LocalContext.current
 
@@ -251,6 +252,7 @@ fun PedometerScreen(vm: AppStateViewModel) {
 
 @Composable
 private fun StatCard(value: String, label: String, icon: ImageVector, color: Color, theme: AppTheme) {
+    val ws = rememberWindowSize()
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -288,6 +290,7 @@ private fun StatCard(value: String, label: String, icon: ImageVector, color: Col
 
 @Composable
 private fun CtrlBtn(label: String, icon: ImageVector, color: Color, modifier: Modifier, onClick: () -> Unit) {
+    val ws = rememberWindowSize()
     Button(
         onClick = onClick,
         modifier = modifier,

@@ -100,6 +100,7 @@ fun BackBtn(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val ws = rememberWindowSize()
     Row(
         modifier = modifier
             .clickable(onClick = onClick)

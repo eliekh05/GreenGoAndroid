@@ -180,6 +180,7 @@ class ReefRescuersGame {
 
 @Composable
 fun OceanGameScreen(vm: AppStateViewModel) {
+    val ws = rememberWindowSize()
     val theme = vm.theme.collectAsState().value
     val game  = remember { ReefRescuersGame() }
     val density = LocalDensity.current

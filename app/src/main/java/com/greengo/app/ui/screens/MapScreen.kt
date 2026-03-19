@@ -216,6 +216,7 @@ private suspend fun geocode(query: String): Pair<Double, Double>? =
 
 @Composable
 fun MapScreen(vm: AppStateViewModel) {
+    val ws = rememberWindowSize()
     val theme   by vm.theme.collectAsState()
     val context  = LocalContext.current
     val scope    = rememberCoroutineScope()
@@ -506,6 +507,7 @@ fun MapScreen(vm: AppStateViewModel) {
 
 @Composable
 private fun MapInfoOverlay(onDismiss: (skipNow: Boolean) -> Unit) {
+    val ws = rememberWindowSize()
     var doNotShow by remember { mutableStateOf(false) }
     val darkGreen = Color(red = 0.04f, green = 0.16f, blue = 0.07f)
 
@@ -587,6 +589,7 @@ private fun MarkerDetailSheet(
     context: Context,
     onDismiss: () -> Unit
 ) {
+    val ws = rememberWindowSize()
     val darkGreen = Color(red = 0.04f, green = 0.12f, blue = 0.06f)
 
     Box(
@@ -671,6 +674,7 @@ private fun MarkerDetailSheet(
 
 @Composable
 private fun DetailRow(emoji: String, text: String) {
+    val ws = rememberWindowSize()
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -690,6 +694,7 @@ private fun DetailRow(emoji: String, text: String) {
 
 @Composable
 fun MapInfoScreen(vm: AppStateViewModel) {
+    val ws = rememberWindowSize()
     val theme by vm.theme.collectAsState()
 
     Column(

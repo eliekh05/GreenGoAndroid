@@ -41,16 +41,16 @@ private data class NavTile(
 
 @Composable
 fun HomeScreen(vm: AppStateViewModel) {
+    val ws = rememberWindowSize()
     val theme       by vm.theme.collectAsState()
     val skipMapInfo by vm.skipMapInfo.collectAsState()
     val ws           = rememberWindowSize()
 
     val tiles = remember {
         listOf(
-            NavTile("Maps",          "Eco-friendly locations",   Icons.Default.Map,      GreenPrimary, "pin",            Screen.MapInfo),
-            NavTile("Functionality", "Translator & Pedometer",   Icons.Default.Settings, BluePrimary,  "languagesphoto", Screen.Functionality),
-            NavTile("Games",         "Learn while you play",     Icons.Default.Games,
-                Color(0.78f, 0.22f, 0.08f, 1f), "game_controller", Screen.Games)
+            NavTile(title="Maps",          sub="Eco-friendly locations",   icon=Icons.Default.Map,      color=GreenPrimary,                         imageName="pin",            dest=Screen.MapInfo),
+            NavTile(title="Functionality", sub="Translator & Pedometer",   icon=Icons.Default.Settings, color=BluePrimary,                          imageName="languagesphoto", dest=Screen.Functionality),
+            NavTile(title="Games",         sub="Learn while you play",     icon=Icons.Default.Games,    color=Color(0.78f, 0.22f, 0.08f, 1f),       imageName="game_controller", dest=Screen.Games)
         )
     }
 
@@ -121,6 +121,7 @@ fun HomeScreen(vm: AppStateViewModel) {
 
 @Composable
 private fun HomeHeader(theme: AppTheme, ws: WindowSize) {
+    val ws = rememberWindowSize()
     val context    = LocalContext.current
     val logoResId  = remember {
         context.resources.getIdentifier("greengologocopy", "drawable", context.packageName)
@@ -145,10 +146,10 @@ private fun HomeHeader(theme: AppTheme, ws: WindowSize) {
             }
             Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
                 Row {
-                    Text("Green", color = GreenPrimary, fontSize = ws.headingSize.sp, fontWeight = FontWeight.ExtraBold)
-                    Text("Go",    color = BluePrimary,  fontSize = ws.headingSize.sp, fontWeight = FontWeight.ExtraBold)
+                    Text("Green", color = GreenPrimary, fontSize = ws.headingSp.sp, fontWeight = FontWeight.ExtraBold)
+                    Text("Go",    color = BluePrimary,  fontSize = ws.headingSp.sp, fontWeight = FontWeight.ExtraBold)
                 }
-                Text("Sustainable Travel Companion", fontSize = (ws.bodyTextSize - 2).sp, color = Color.Gray)
+                Text("Sustainable Travel Companion", fontSize = (ws.bodySp - 2f).sp, color = Color.Gray)
             }
             Spacer(modifier = Modifier.weight(1f))
         }
@@ -158,6 +159,7 @@ private fun HomeHeader(theme: AppTheme, ws: WindowSize) {
 
 @Composable
 private fun TileCard(tile: NavTile, theme: AppTheme, ws: WindowSize, onClick: () -> Unit) {
+    val ws = rememberWindowSize()
     val context     = LocalContext.current
     val imageResId  = remember(tile.imageName) {
         context.resources.getIdentifier(tile.imageName, "drawable", context.packageName)
@@ -191,8 +193,8 @@ private fun TileCard(tile: NavTile, theme: AppTheme, ws: WindowSize, onClick: ()
                     Icon(tile.icon, null, tint = Color.White, modifier = Modifier.size(ws.tileIconSize * 0.5f))
             }
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(tile.title, color = tile.color, fontSize = (ws.bodyTextSize + 6).sp, fontWeight = FontWeight.Bold)
-                Text(tile.sub,   fontSize = ws.bodyTextSize.sp, color = theme.mutedText)
+                Text(tile.title, color = tile.color, fontSize = (ws.bodySp + 6f).sp, fontWeight = FontWeight.Bold)
+                Text(tile.sub,   fontSize = ws.bodySp.sp, color = theme.mutedText)
             }
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null,
                 tint = tile.color, modifier = Modifier.size(ws.smallIconSize))
@@ -202,6 +204,7 @@ private fun TileCard(tile: NavTile, theme: AppTheme, ws: WindowSize, onClick: ()
 
 @Composable
 private fun SmallBtn(label: String, icon: ImageVector, color: Color, modifier: Modifier, onClick: () -> Unit) {
+    val ws = rememberWindowSize()
     Button(
         onClick = onClick,
         modifier = modifier,

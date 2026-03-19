@@ -24,6 +24,7 @@ import com.greengo.app.ui.components.WindowSize
 
 @Composable
 fun PreferencesScreen(vm: AppStateViewModel) {
+    val ws = rememberWindowSize()
     val theme       by vm.theme.collectAsState()
     val triviaScore by vm.triviaScore.collectAsState()
     val memoryScore by vm.memoryScore.collectAsState()
@@ -144,6 +145,7 @@ fun PreferencesScreen(vm: AppStateViewModel) {
 
 @Composable
 fun SettingsScreen(vm: AppStateViewModel) {
+    val ws = rememberWindowSize()
     val theme       by vm.theme.collectAsState()
     val triviaScore by vm.triviaScore.collectAsState()
     val memoryScore by vm.memoryScore.collectAsState()
@@ -241,6 +243,7 @@ fun SettingsScreen(vm: AppStateViewModel) {
 
 @Composable
 private fun PrefSection(title: String, content: @Composable ColumnScope.() -> Unit) {
+    val ws = rememberWindowSize()
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(title, fontSize = ws.captionSp.sp, fontWeight = FontWeight.SemiBold, color = Color.Gray,
             modifier = Modifier.padding(start = 4.dp))
@@ -250,6 +253,7 @@ private fun PrefSection(title: String, content: @Composable ColumnScope.() -> Un
 
 @Composable
 private fun ScoreRow(label: String, value: Int, theme: AppTheme) {
+    val ws = rememberWindowSize()
     Surface(color = theme.cardBackground, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
         Row(modifier = Modifier.padding(horizontal = ws.contentPadding, vertical = ws.buttonVPadding),
             verticalAlignment = Alignment.CenterVertically) {

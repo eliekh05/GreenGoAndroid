@@ -85,6 +85,7 @@ private fun ToolCard(
     theme: AppTheme,
     onClick: () -> Unit
 ) {
+    val ws = rememberWindowSize()
     val context = LocalContext.current
     val imageResId = remember(imageName) {
         context.resources.getIdentifier(imageName, "drawable", context.packageName)

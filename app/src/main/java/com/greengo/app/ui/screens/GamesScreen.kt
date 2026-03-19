@@ -33,6 +33,7 @@ import com.greengo.app.ui.components.WindowSize
 
 @Composable
 fun GamesScreen(vm: AppStateViewModel) {
+    val ws = rememberWindowSize()
     val theme       by vm.theme.collectAsState()
     val memoryScore by vm.memoryScore.collectAsState()
     val oceanScore  by vm.oceanScore.collectAsState()
@@ -110,6 +111,7 @@ private fun GameCard(
     theme: AppTheme,
     onClick: () -> Unit
 ) {
+    val ws = rememberWindowSize()
     val context = LocalContext.current
     val imageResId = remember(bannerImage) {
         context.resources.getIdentifier(bannerImage, "drawable", context.packageName)

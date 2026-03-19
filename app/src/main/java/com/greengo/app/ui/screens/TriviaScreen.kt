@@ -34,6 +34,7 @@ import com.greengo.app.data.allTriviaQuestions
 
 @Composable
 fun TriviaScreen(vm: AppStateViewModel) {
+    val ws = rememberWindowSize()
     val theme by vm.theme.collectAsState()
 
     // Game state — rebuilt on each new game (matching iOS buildGame())
@@ -183,6 +184,7 @@ private fun AnswerCard(
     theme: AppTheme,
     onClick: () -> Unit
 ) {
+    val ws = rememberWindowSize()
     val context = LocalContext.current
     val resId = remember(ans.imageName) {
         context.resources.getIdentifier(ans.imageName, "drawable", context.packageName)
@@ -255,6 +257,7 @@ private fun TriviaNavBar(
     theme: AppTheme,
     onBack: () -> Unit
 ) {
+    val ws = rememberWindowSize()
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
@@ -307,6 +310,7 @@ private fun TriviaNavBar(
 
 @Composable
 fun TriviaScoreScreen(vm: AppStateViewModel, score: Int) {
+    val ws = rememberWindowSize()
     val green = Color(red = 0.08f, green = 0.42f, blue = 0.14f)
     val maxScore = allTriviaQuestions.size * 10
     val context = LocalContext.current

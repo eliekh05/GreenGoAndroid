@@ -264,7 +264,8 @@ private fun ContactField(
     keyboardType: KeyboardType = KeyboardType.Default,
     theme: com.greengo.app.data.AppTheme
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    val ws = rememberWindowSize()
+    Column(verticalArrangement = Arrangement.spacedBy(ws.cardSpacing)) {
         Text(placeholder, fontSize = ws.captionSp.sp, color = theme.text.copy(alpha = 0.7f))
         TextField(
             value = value,
