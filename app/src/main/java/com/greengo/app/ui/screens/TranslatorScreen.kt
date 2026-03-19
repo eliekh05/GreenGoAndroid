@@ -16,101 +16,80 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.text.font.*
+import com.google.mlkit.common.model.DownloadConditions
+import com.google.mlkit.nl.translate.TranslateLanguage
+import com.google.mlkit.nl.translate.Translation
+import com.google.mlkit.nl.translate.TranslatorOptions
 import com.greengo.app.data.AppStateViewModel
 import com.greengo.app.data.Screen
 import com.greengo.app.ui.components.NavBar
 import com.greengo.app.ui.components.rememberWindowSize
 import com.greengo.app.ui.components.WindowSize
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONObject
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.Locale
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MARK: - Google Cloud Translate API key
-// Replace with your actual API key from Google Cloud Console
+// Language list — mirrors iOS TranslatorEngine.languages
+// On-device ML Kit, no API key needed, works offline after first download
 // ─────────────────────────────────────────────────────────────────────────────
 
-private const val GOOGLE_TRANSLATE_API_KEY = "YOUR_GOOGLE_TRANSLATE_API_KEY"
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MARK: - Language list
-// Uses BCP-47 language codes for Google Translate API
-// ─────────────────────────────────────────────────────────────────────────────
-
-private data class LangEntry(val name: String, val googleCode: String, val bcp47: String)
+private data class LangEntry(val name: String, val mlkitCode: String, val bcp47: String)
 
 private val languages = listOf(
-    LangEntry("Arabic",              "ar",    "ar-SA"),
-    LangEntry("Chinese Simplified",  "zh-CN", "zh-CN"),
-    LangEntry("Chinese Traditional", "zh-TW", "zh-TW"),
-    LangEntry("Czech",               "cs",    "cs-CZ"),
-    LangEntry("Danish",              "da",    "da-DK"),
-    LangEntry("Dutch",               "nl",    "nl-NL"),
-    LangEntry("Finnish",             "fi",    "fi-FI"),
-    LangEntry("French",              "fr",    "fr-FR"),
-    LangEntry("German",              "de",    "de-DE"),
-    LangEntry("Greek",               "el",    "el-GR"),
-    LangEntry("Hebrew",              "iw",    "he-IL"),
-    LangEntry("Hindi",               "hi",    "hi-IN"),
-    LangEntry("Hungarian",           "hu",    "hu-HU"),
-    LangEntry("Indonesian",          "id",    "id-ID"),
-    LangEntry("Italian",             "it",    "it-IT"),
-    LangEntry("Japanese",            "ja",    "ja-JP"),
-    LangEntry("Korean",              "ko",    "ko-KR"),
-    LangEntry("Malay",               "ms",    "ms-MY"),
-    LangEntry("Norwegian",           "no",    "no-NO"),
-    LangEntry("Persian",             "fa",    "fa-IR"),
-    LangEntry("Polish",              "pl",    "pl-PL"),
-    LangEntry("Portuguese",          "pt",    "pt-BR"),
-    LangEntry("Romanian",            "ro",    "ro-RO"),
-    LangEntry("Russian",             "ru",    "ru-RU"),
-    LangEntry("Spanish",             "es",    "es-ES"),
-    LangEntry("Swedish",             "sv",    "sv-SE"),
-    LangEntry("Thai",                "th",    "th-TH"),
-    LangEntry("Turkish",             "tr",    "tr-TR"),
-    LangEntry("Ukrainian",           "uk",    "uk-UA"),
-    LangEntry("Vietnamese",          "vi",    "vi-VN")
+    LangEntry("Arabic",              TranslateLanguage.ARABIC,      "ar-SA"),
+    LangEntry("Chinese Simplified",  TranslateLanguage.CHINESE,     "zh-CN"),
+    LangEntry("Dutch",               TranslateLanguage.DUTCH,       "nl-NL"),
+    LangEntry("French",              TranslateLanguage.FRENCH,      "fr-FR"),
+    LangEntry("German",              TranslateLanguage.GERMAN,      "de-DE"),
+    LangEntry("Indonesian",          TranslateLanguage.INDONESIAN,  "id-ID"),
+    LangEntry("Italian",             TranslateLanguage.ITALIAN,     "it-IT"),
+    LangEntry("Japanese",            TranslateLanguage.JAPANESE,    "ja-JP"),
+    LangEntry("Korean",              TranslateLanguage.KOREAN,      "ko-KR"),
+    LangEntry("Polish",              TranslateLanguage.POLISH,      "pl-PL"),
+    LangEntry("Portuguese",          TranslateLanguage.PORTUGUESE,  "pt-BR"),
+    LangEntry("Russian",             TranslateLanguage.RUSSIAN,     "ru-RU"),
+    LangEntry("Spanish",             TranslateLanguage.SPANISH,     "es-ES"),
+    LangEntry("Thai",                TranslateLanguage.THAI,        "th-TH"),
+    LangEntry("Turkish",             TranslateLanguage.TURKISH,     "tr-TR"),
+    LangEntry("Ukrainian",           TranslateLanguage.UKRAINIAN,   "uk-UA"),
+    LangEntry("Vietnamese",          TranslateLanguage.VIETNAMESE,  "vi-VN")
 )
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MARK: - Google Cloud Translate REST helper
+// ML Kit on-device translate — suspend helper
 // ─────────────────────────────────────────────────────────────────────────────
 
-private val httpClient = OkHttpClient()
-
-private suspend fun googleTranslate(text: String, targetLang: String): String =
-    withContext(Dispatchers.IO) {
-        val url = "https://translation.googleapis.com/language/translate/v2?key=$GOOGLE_TRANSLATE_API_KEY"
-        val json = JSONObject().apply {
-            put("q", text)
-            put("source", "en")
-            put("target", targetLang)
-            put("format", "text")
-        }
-        val body = json.toString().toRequestBody("application/json".toMediaType())
-        val request = Request.Builder().url(url).post(body).build()
-        val response = httpClient.newCall(request).execute()
-        val responseBody = response.body?.string() ?: throw Exception("Empty response")
-        if (!response.isSuccessful) {
-            val errObj = runCatching { JSONObject(responseBody).getJSONObject("error").getString("message") }
-                .getOrDefault("HTTP ${response.code}")
-            throw Exception("Translate error: $errObj")
-        }
-        val result = JSONObject(responseBody)
-        result.getJSONObject("data")
-            .getJSONArray("translations")
-            .getJSONObject(0)
-            .getString("translatedText")
+private suspend fun mlkitTranslate(text: String, targetLang: String): String =
+    suspendCancellableCoroutine { cont ->
+        val options = TranslatorOptions.Builder()
+            .setSourceLanguage(TranslateLanguage.ENGLISH)
+            .setTargetLanguage(targetLang)
+            .build()
+        val translator = Translation.getClient(options)
+        val conditions = DownloadConditions.Builder().requireWifi().build()
+        translator.downloadModelIfNeeded(conditions)
+            .addOnSuccessListener {
+                translator.translate(text)
+                    .addOnSuccessListener { result ->
+                        translator.close()
+                        if (cont.isActive) cont.resume(result)
+                    }
+                    .addOnFailureListener { e ->
+                        translator.close()
+                        if (cont.isActive) cont.resumeWithException(e)
+                    }
+            }
+            .addOnFailureListener { e ->
+                translator.close()
+                if (cont.isActive) cont.resumeWithException(e)
+            }
     }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MARK: - TranslatorScreen
+// TranslatorScreen
 // ─────────────────────────────────────────────────────────────────────────────
 
 @Composable
@@ -123,6 +102,7 @@ fun TranslatorScreen(vm: AppStateViewModel) {
     var inputText      by remember { mutableStateOf("") }
     var translatedText by remember { mutableStateOf("") }
     var isTranslating  by remember { mutableStateOf(false) }
+    var statusMessage  by remember { mutableStateOf<String?>(null) }
     var errorMessage   by remember { mutableStateOf<String?>(null) }
     var selectedIndex  by remember { mutableStateOf(0) }
     var isListening    by remember { mutableStateOf(false) }
@@ -166,16 +146,19 @@ fun TranslatorScreen(vm: AppStateViewModel) {
                     isListening = false
                     if (inputText.isNotBlank()) {
                         isTranslating = true; errorMessage = null; translatedText = ""
+                        statusMessage = "Downloading model if needed…"
                         scope.launch {
-                            runCatching { googleTranslate(inputText.trim(), currentLang.googleCode) }
+                            runCatching { mlkitTranslate(inputText.trim(), currentLang.mlkitCode) }
                                 .onSuccess { result ->
                                     translatedText = result
                                     isTranslating = false
+                                    statusMessage = null
                                     speak(result)
                                 }
                                 .onFailure { e ->
                                     errorMessage = "Translation failed: ${e.localizedMessage}"
                                     isTranslating = false
+                                    statusMessage = null
                                 }
                         }
                     }
@@ -208,16 +191,19 @@ fun TranslatorScreen(vm: AppStateViewModel) {
     fun triggerTranslation() {
         val q = inputText.trim(); if (q.isEmpty()) return
         isTranslating = true; errorMessage = null; translatedText = ""; stopSpeaking()
+        statusMessage = "Downloading model if needed…"
         scope.launch {
-            runCatching { googleTranslate(q, currentLang.googleCode) }
+            runCatching { mlkitTranslate(q, currentLang.mlkitCode) }
                 .onSuccess { result ->
                     translatedText = result
                     isTranslating = false
+                    statusMessage = null
                     speak(result)
                 }
                 .onFailure { e ->
                     errorMessage = "Translation failed: ${e.localizedMessage}"
                     isTranslating = false
+                    statusMessage = null
                 }
         }
     }
@@ -244,6 +230,14 @@ fun TranslatorScreen(vm: AppStateViewModel) {
                 .padding(ws.cardInnerPadding),
             verticalArrangement = Arrangement.spacedBy(ws.cardSpacing)
         ) {
+            // Info banner
+            Text(
+                "No API key needed — translation runs on-device via Google ML Kit. " +
+                "First use downloads a ~30MB model per language over WiFi.",
+                fontSize = ws.captionSp.sp,
+                color = theme.mutedText
+            )
+
             // Language picker
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text("Translate to", fontSize = ws.captionSp.sp, color = theme.mutedText)
@@ -253,6 +247,7 @@ fun TranslatorScreen(vm: AppStateViewModel) {
                         selectedIndex  = idx
                         translatedText = ""
                         errorMessage   = null
+                        statusMessage  = null
                         stopSpeaking()
                     },
                     theme = theme
@@ -265,7 +260,10 @@ fun TranslatorScreen(vm: AppStateViewModel) {
                     Text("English text", fontSize = ws.captionSp.sp, color = theme.text.copy(alpha = 0.7f))
                     Spacer(modifier = Modifier.weight(1f))
                     if (inputText.isNotEmpty()) {
-                        TextButton(onClick = { inputText = ""; translatedText = ""; errorMessage = null; stopSpeaking() }) {
+                        TextButton(onClick = {
+                            inputText = ""; translatedText = ""
+                            errorMessage = null; statusMessage = null; stopSpeaking()
+                        }) {
                             Text("Clear", fontSize = ws.captionSp.sp, color = theme.accent)
                         }
                     }
@@ -300,7 +298,7 @@ fun TranslatorScreen(vm: AppStateViewModel) {
                     contentPadding = PaddingValues(vertical = ws.buttonVPadding)
                 ) {
                     Text(
-                        if (isTranslating) "Translating…" else "Get Translation",
+                        if (isTranslating) "Translating…" else "Translate",
                         fontSize = ws.bodySp.sp, fontWeight = FontWeight.Bold, color = Color.White
                     )
                 }
@@ -317,7 +315,8 @@ fun TranslatorScreen(vm: AppStateViewModel) {
                         horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         Icon(
                             imageVector = if (isListening) Icons.Default.MicOff else Icons.Default.Mic,
-                            contentDescription = null, tint = Color.White, modifier = Modifier.size(ws.smallIconSize)
+                            contentDescription = null, tint = Color.White,
+                            modifier = Modifier.size(ws.smallIconSize)
                         )
                         Text(if (isListening) "Stop" else "Speak",
                             fontSize = ws.bodySp.sp, fontWeight = FontWeight.Bold, color = Color.White)
@@ -325,11 +324,21 @@ fun TranslatorScreen(vm: AppStateViewModel) {
                 }
             }
 
+            // Status (downloading model etc)
+            statusMessage?.let {
+                Row(verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp)
+                    Text(it, fontSize = ws.captionSp.sp, color = theme.mutedText)
+                }
+            }
+
             // Translation output
             if (translatedText.isNotEmpty()) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(currentLang.name, fontSize = ws.captionSp.sp, color = theme.text.copy(alpha = 0.7f))
+                        Text(currentLang.name, fontSize = ws.captionSp.sp,
+                            color = theme.text.copy(alpha = 0.7f))
                         Spacer(modifier = Modifier.weight(1f))
                         IconButton(onClick = {
                             if (isSpeaking) stopSpeaking() else speak(translatedText)
@@ -363,7 +372,7 @@ fun TranslatorScreen(vm: AppStateViewModel) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MARK: - Language picker (ExposedDropdownMenu)
+// Language picker
 // ─────────────────────────────────────────────────────────────────────────────
 
 @OptIn(ExperimentalMaterial3Api::class)

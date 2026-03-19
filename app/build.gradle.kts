@@ -80,6 +80,7 @@ dependencies {
     implementation("androidx.media3:media3-ui:1.4.1")
 
     implementation("org.osmdroid:osmdroid-android:6.1.20")
+    implementation("com.google.mlkit:translate:17.0.3")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
