@@ -14,6 +14,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up SonarCloud
+        uses: SonarSource/sonarcloud-github-action@v2.1.0
+        with:
+          organization: "<eliekh05>"
+          token: ${{ secrets.SONAR_TOKEN }}
+
       - name: Set up JDK 25
         uses: actions/setup-java@v5.2.0
         with:
@@ -30,6 +36,13 @@ jobs:
           
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+
+      - name: Run SonarCloud analysis
+        run: ./gradlew sonarqube \
+               -Dsonar.projectKey=GreenGoAndroid \
+               -Dsonar.organization=<your-sonar-org> \
+               -Dsonar.host.url=https://sonarcloud.io \
+               -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
       - name: Build release APK
         run: ./gradlew assembleRelease
