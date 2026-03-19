@@ -5,7 +5,6 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch:
 
 jobs:
   build:
@@ -20,19 +19,19 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-          cache-disabled: true
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.9'
           cache-disabled: true
+          gradle-home-cache-cleanup: true
           
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
       - name: Build release APK
-        run: ./gradlew assembleRelease --no-daemon --stacktrace
+        run: ./gradlew assembleRelease
 
       - name: Rename APK to GreenGo.apk
         run: cp app/build/outputs/apk/release/app-release-unsigned.apk GreenGo.apk
