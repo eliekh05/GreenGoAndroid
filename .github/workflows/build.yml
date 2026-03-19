@@ -25,7 +25,7 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # 🔐 Decode keystore (REQUIRED for signed APK)
+      # 🔐 Decode the keystore
       - name: Decode keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > greengo.keystore
 
@@ -35,6 +35,32 @@ jobs:
         env:
           RELEASE_STORE_FILE: greengo.keystore
           RELEASE_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+      # ✅ Rename APK
+      - name: Rename APK
+        run: cp app/build/outputs/apk/release/app-release.apk GreenGo.apk
+
+      - name: Verify APK exists
+        run: test -f GreenGo.apk
+
+      # 🗂 Upload as artifact so you can download & test
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GreenGo APK
+          path: GreenGo.apk
+
+      # 🏷 Optional: Create GitHub release automatically
+      - name: Create Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          files: GreenGo.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}          RELEASE_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           RELEASE_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
