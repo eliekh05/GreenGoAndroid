@@ -218,7 +218,7 @@ fun ContactScreen(vm: AppStateViewModel) {
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Sending…", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 } else {
-                    Icon(imageVector = Icons.Default.Send, contentDescription = null, tint = Color.White, modifier = Modifier.size(ws.smallIconSize))
+                    Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = null, tint = Color.White, modifier = Modifier.size(ws.smallIconSize))
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Send Email", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 }

@@ -439,7 +439,7 @@ fun TranslatorScreen(vm: AppStateViewModel) {
                             if (isSpeaking) stopSpeaking() else speak(translatedText)
                         }) {
                             Icon(
-                                imageVector = if (isSpeaking) Icons.Default.VolumeOff else Icons.Default.VolumeUp,
+                                imageVector = if (isSpeaking) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp,
                                 contentDescription = "Speak",
                                 tint     = theme.accent,
                                 modifier = Modifier.size(24.dp)

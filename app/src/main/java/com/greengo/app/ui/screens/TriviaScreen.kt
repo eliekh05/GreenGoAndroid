@@ -211,7 +211,7 @@ private fun AnswerCard(
         enabled = !showFeedback,
         shape = RoundedCornerShape(12.dp),
         color = if (isChosen) tint.copy(alpha = 0.35f) else theme.background.copy(alpha = 0.12f),
-        border = if (isChosen) ButtonDefaults.outlinedButtonBorder else null,
+        border = if (isChosen) ButtonDefaults.outlinedButtonBorder(enabled = true) else null,
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(

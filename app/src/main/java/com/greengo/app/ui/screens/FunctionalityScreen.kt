@@ -68,7 +68,7 @@ fun FunctionalityScreen(vm: AppStateViewModel) {
             ToolCard(
                 title     = "Pedometer",
                 sub       = "Count steps, track distance and time on any walk",
-                icon      = Icons.Default.DirectionsWalk,
+                icon      = Icons.AutoMirrored.Filled.DirectionsWalk,
                 imageName = "pedometer",
                 color     = Color(red = 0.08f, green = 0.52f, blue = 0.12f),
                 theme     = theme

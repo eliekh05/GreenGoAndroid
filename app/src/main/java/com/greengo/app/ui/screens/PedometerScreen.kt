@@ -189,7 +189,7 @@ fun PedometerScreen(vm: AppStateViewModel) {
                     modifier = Modifier.fillMaxSize()
                 ) {}
                 Icon(
-                    imageVector = Icons.Default.DirectionsWalk,
+                    imageVector = Icons.AutoMirrored.Filled.DirectionsWalk,
                     contentDescription = null,
                     tint = green,
                     modifier = Modifier.size(ws.tileIconSize)
@@ -209,7 +209,7 @@ fun PedometerScreen(vm: AppStateViewModel) {
             ) {
                 item {
                     StatCard("${pedo.steps}", "Steps",
-                        Icons.Default.DirectionsWalk, green, theme)
+                        Icons.AutoMirrored.Filled.DirectionsWalk, green, theme)
                 }
                 item {
                     StatCard("${"%.2f".format(pedo.distanceKm)} km", "Distance",

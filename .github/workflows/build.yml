@@ -25,9 +25,9 @@ jobs:
         with:
           gradle-version: '9.4.1'
 
-      - name: "Validation"
+      - name: Validation
         uses: gradle/actions/wrapper-validation@v5
-          
+
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
@@ -36,11 +36,20 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > $GITHUB_WORKSPACE/greengo.jks
+
       - name: Build release APK
         run: ./gradlew assembleRelease
+        env:
+          SIGNING_STORE_FILE: ${{ github.workspace }}/greengo.jks
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
 
-      - name: Rename APK to GreenGo.apk
-        run: cp app/build/outputs/apk/release/app-release-unsigned.apk GreenGo.apk
+      - name: Rename APK
+        run: cp app/build/outputs/apk/release/app-release.apk GreenGo.apk
 
       - name: Verify APK exists
         run: test -f GreenGo.apk && echo "APK ready" || (echo "APK missing" && exit 1)
