@@ -32,6 +32,22 @@ import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Marker.OnMarkerClickListener
 import java.net.URL
 import java.net.URLEncoder
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.ui.draw.*
+import androidx.compose.ui.geometry.*
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.layout.*
+import androidx.compose.ui.platform.*
+import androidx.compose.ui.res.*
+import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.style.*
+import androidx.compose.ui.unit.*
+import androidx.compose.ui.viewinterop.*
+import androidx.compose.foundation.shape.*
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.*
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MARK: - Domain models  (mirrors iOS MarkerCategory / EcoMarker / Continent)

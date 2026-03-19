@@ -18,6 +18,21 @@ import com.greengo.app.ui.components.WindowSize
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import java.util.UUID
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.ui.draw.*
+import androidx.compose.ui.geometry.*
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.platform.*
+import androidx.compose.ui.res.*
+import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.style.*
+import androidx.compose.ui.unit.*
+import androidx.compose.ui.viewinterop.*
+import androidx.compose.foundation.shape.*
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.*
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MARK: - MemCard model
