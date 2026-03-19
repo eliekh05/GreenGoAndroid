@@ -17,10 +17,10 @@ android {
 
     signingConfigs {
     create("release") {
-        storeFile = file(System.getenv("ORG_GRADLE_PROJECT_STOREFILE"))
-        storePassword = System.getenv("ORG_GRADLE_PROJECT_STOREPASSWORD")
-        keyAlias = System.getenv("ORG_GRADLE_PROJECT_KEYALIAS")
-        keyPassword = System.getenv("ORG_GRADLE_PROJECT_KEYPASSWORD")
+        storeFile = file(System.getenv("ORG_GRADLE_PROJECT_KEYBASE_BASE64"))
+        storePassword = System.getenv("ORG_GRADLE_PROJECT_KEYSTORE_PASSWORD")
+        keyAlias = System.getenv("ORG_GRADLE_PROJECT_KEY_ALIAS")
+        keyPassword = System.getenv("ORG_GRADLE_PROJECT_KEY_PASSWORD")
     }
 }
     buildTypes {
