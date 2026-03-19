@@ -24,7 +24,6 @@ jobs:
            -Dsonar.organization=eliekh05
            -Dsonar.projectKey=eliekh05_GreenGoAndroid
            -Dsonar.sources=.
-           -Dsonar.host.url=https://sonarcloud.io
 
       - name: Set up JDK 25
         uses: actions/setup-java@v5.2.0
@@ -44,10 +43,9 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run SonarCloud analysis
-        run: ./gradlew \
+        run: ./gradlew sonarqube \
                -Dsonar.projectKey=eliekh05_GreenGoAndroid \
                -Dsonar.organization=eliekh05 \
-               -Dsonar.host.url=https://sonarcloud.io \
                -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
       - name: Build release APK
