@@ -40,7 +40,7 @@ jobs:
         run: |
          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > $GITHUB_WORKSPACE/greengo-release.jks
 
-      - name: Build release APK
+      - name: Build Release APK
         run: ./gradlew assembleRelease
         env:
           ORG_GRADLE_PROJECT_STOREFILE: $GITHUB_WORKSPACE/greengo-release.jks
