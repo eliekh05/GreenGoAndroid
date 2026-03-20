@@ -40,7 +40,7 @@ jobs:
         run: ./gradlew assembleRelease
 
       - name: Rename APK
-        run: cp app/build/outputs/apk/release/app-release.apk GreenGo.apk
+        run: cp app/build/outputs/apk/release/app-release-unsigned.apk GreenGo.apk 2>/dev/null || cp app/build/outputs/apk/release/app-release.apk GreenGo.apk
 
       - name: Verify APK exists
         run: test -f GreenGo.apk && echo "APK ready" || (echo "APK missing" && exit 1)
