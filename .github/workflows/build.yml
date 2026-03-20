@@ -42,9 +42,9 @@ jobs:
       - name: Setup Android SDK Tools
         uses: android-actions/setup-android@v3.2.2
 
-      - name: Install Android build tools   # 👈 THIS FIXES YOUR ERROR
+      - name: Android platform tools   # 👈 THIS FIXES YOUR ERROR
         run: |
-         sdkmanager "build-tools;34.0.0"
+         sdkmanager tools platform-tools
 
       - name: Check signing secrets
         id: check_secrets
@@ -67,7 +67,7 @@ jobs:
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
-          ANDROID_HOME: ~/.android
+          ANDROID_HOME: /usr/local/lib/android/sdk/
           ANDROID_SDK_ROOT: /usr/local/lib/android/sdk/
 
       - name: Copy APK (signed if available, otherwise unsigned)
