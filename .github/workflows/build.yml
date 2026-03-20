@@ -63,7 +63,8 @@ jobs:
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
-          BUILD_TOOLS_VERSION: 12266719
+          ANDROID_HOME: ~/.android
+          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk/
 
       - name: Copy APK (signed if available, otherwise unsigned)
         run: |
