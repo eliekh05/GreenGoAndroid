@@ -31,13 +31,13 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Build release APK (unsigned)
+        run: ./gradlew assembleRelease
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      - name: Build release APK (unsigned)
-        run: ./gradlew assembleRelease
 
       - name: Check signing secrets
         id: check_secrets
