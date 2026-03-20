@@ -36,11 +36,31 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Build Release APK
+      - name: Build release APK (unsigned)
         run: ./gradlew assembleRelease
 
-      - name: Rename APK
-        run: cp app/build/outputs/apk/release/app-release-unsigned.apk GreenGo.apk 2>/dev/null || cp app/build/outputs/apk/release/app-release.apk GreenGo.apk
+      - name: Sign APK
+        if: ${{ secrets.SIGNING_KEY != '' }}
+        uses: r0adkll/sign-android-release@v1
+        id: sign_app
+        with:
+          releaseDirectory: app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          alias: ${{ secrets.KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: "35.0.0"
+
+      - name: Copy APK
+        run: |
+          if [ -f "${{ steps.sign_app.outputs.signedReleaseFile }}" ]; then
+            cp "${{ steps.sign_app.outputs.signedReleaseFile }}" GreenGo.apk
+            echo "Using signed APK"
+          else
+            cp app/build/outputs/apk/release/app-release-unsigned.apk GreenGo.apk
+            echo "Using unsigned APK (no signing secrets set)"
+          fi
 
       - name: Verify APK exists
         run: test -f GreenGo.apk && echo "APK ready" || (echo "APK missing" && exit 1)
