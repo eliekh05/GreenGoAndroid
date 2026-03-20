@@ -75,12 +75,4 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
-
-sonar {
-    properties {
-        property("sonar.projectKey", "eliekh05_GreenGoAndroid")
-        property("sonar.organization", "eliekh05")
-        property("sonar.sources", "src/main/java")
-        property("sonar.sourceEncoding", "UTF-8")
-    }
 }

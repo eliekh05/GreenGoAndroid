@@ -35,7 +35,7 @@ jobs:
         run: ./gradlew assembleRelease
 
       - name: SonarQube Scan
-        run: ./gradlew sonar
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
