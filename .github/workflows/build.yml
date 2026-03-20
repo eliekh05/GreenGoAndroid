@@ -42,6 +42,10 @@ jobs:
       - name: Setup Android SDK Tools
         uses: android-actions/setup-android@v3.2.2
 
+      - name: Install Android build tools   # 👈 THIS FIXES YOUR ERROR
+        run: |
+         sdkmanager "build-tools;34.0.0"
+
       - name: Check signing secrets
         id: check_secrets
         run: |
