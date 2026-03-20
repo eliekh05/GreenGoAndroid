@@ -39,6 +39,9 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+      - name: Setup Android SDK Tools
+        uses: android-actions/setup-android@v3.2.2
+
       - name: Check signing secrets
         id: check_secrets
         run: |
