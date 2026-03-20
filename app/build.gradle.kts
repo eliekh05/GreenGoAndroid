@@ -15,14 +15,6 @@ android {
         versionName   = "1.0"
     }
 
-    signingConfigs {
-    create("release") {
-        storeFile = file(System.getenv("ORG_GRADLE_PROJECT_KEYBASE_BASE64"))
-        storePassword = System.getenv("ORG_GRADLE_PROJECT_KEYSTORE_PASSWORD")
-        keyAlias = System.getenv("ORG_GRADLE_PROJECT_KEY_ALIAS")
-        keyPassword = System.getenv("ORG_GRADLE_PROJECT_KEY_PASSWORD")
-    }
-}
     buildTypes {
         release {
             isMinifyEnabled = false

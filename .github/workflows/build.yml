@@ -36,20 +36,8 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Decode keystore
-        run: |
-         echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > $GITHUB_WORKSPACE/greengo.jks
-
       - name: Build Release APK
         run: ./gradlew assembleRelease
-        env:
-          ORG_GRADLE_PROJECT_STOREFILE: ${{ github.workspace }}/***.jks
-          ORG_GRADLE_PROJECT_STOREPASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          ORG_GRADLE_PROJECT_KEYALIAS: ${{ secrets.KEY_ALIAS }}
-          ORG_GRADLE_PROJECT_KEYPASSWORD: ${{ secrets.KEY_PASSWORD }}
-
-      - name: Rename APK
-        run: cp app/build/outputs/apk/release/app-release.apk GreenGo.apk
 
       - name: Verify APK exists
         run: test -f GreenGo.apk && echo "APK ready" || (echo "APK missing" && exit 1)
