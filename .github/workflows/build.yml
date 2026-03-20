@@ -42,7 +42,7 @@ jobs:
       - name: Setup Android SDK Tools
         uses: android-actions/setup-android@v3.2.2
 
-      - name: Android platform tools   # 👈 THIS FIXES YOUR ERROR
+      - name: Android platform tools
         run: |
          sdkmanager tools platform-tools
 
@@ -55,17 +55,16 @@ jobs:
             echo "SIGNING_KEY_SET=false" >> $GITHUB_ENV
           fi
 
-      - name: Sign APK (only if secrets are set)
-        if: ${{ env.SIGNING_KEY_SET == 'true' }}
-        # Note: uses env var check below
-        uses: ilharp/sign-android-release@v1
+      - uses: ilharp/sign-android-release@v2 # Or use @nightly
+        name: Sign app APK
         id: sign_app
         with:
           releaseDir: app/build/outputs/apk/release
           signingKey: ${{ secrets.SIGNING_KEY }}
           keyAlias: ${{ secrets.KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
+          buildToolsVersion: 36.0.0
 
       - name: Copy APK (signed if available, otherwise unsigned)
         run: |
