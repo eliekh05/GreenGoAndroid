@@ -35,7 +35,7 @@ jobs:
         run: ./gradlew assembleRelease
 
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v6
+        run: ./gradlew sonar
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
@@ -51,7 +51,7 @@ jobs:
       - name: Sign APK (only if secrets are set)
         if: ${{ env.SIGNING_KEY_SET == 'true' }}
         # Note: uses env var check below
-        uses: r0adkll/sign-android-release@v1
+        uses: ilharp/sign-android-release@v1
         id: sign_app
         with:
           releaseDirectory: app/build/outputs/apk/release
