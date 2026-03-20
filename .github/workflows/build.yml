@@ -39,8 +39,18 @@ jobs:
       - name: Build release APK (unsigned)
         run: ./gradlew assembleRelease
 
+      - name: Check signing secrets
+        id: check_secrets
+        run: |
+          if [ -n "${{ secrets.SIGNING_KEY }}" ]; then
+            echo "SIGNING_KEY_SET=true" >> $GITHUB_ENV
+          else
+            echo "SIGNING_KEY_SET=false" >> $GITHUB_ENV
+          fi
+
       - name: Sign APK (only if secrets are set)
-        if: ${{ secrets.SIGNING_KEY != '' }}
+        if: ${{ env.SIGNING_KEY_SET == 'true' }}
+        # Note: uses env var check below
         uses: r0adkll/sign-android-release@v1
         id: sign_app
         with:
