@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.material.icons.*
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material3.*
@@ -390,7 +391,7 @@ fun TranslatorScreen(vm: AppStateViewModel) {
                     contentPadding = PaddingValues(vertical = ws.buttonVPadding)
                 ) {
                     Text(
-                        if (isTranslating) "Translating…" else "Translate",
+                        if (isTranslating) "Translating…" else "Get Translation",
                         fontSize   = ws.bodySp.sp,
                         fontWeight = FontWeight.Bold,
                         color      = Color.White

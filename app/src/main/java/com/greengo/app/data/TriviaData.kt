@@ -54,7 +54,7 @@ val allTriviaQuestions: List<TriviaQuestion> = listOf(
             ),
             TriviaAnswer(
                 text = "Car",
-                imageName = "CAR",
+                imageName = "car",
                 explanation = "Cars increase negative environmental impacts on Earth by emitting greenhouse gases, air pollution, relying on non-renewable resources, and requiring significant land use for infrastructure."
             ),
             TriviaAnswer(
@@ -75,7 +75,7 @@ val allTriviaQuestions: List<TriviaQuestion> = listOf(
             ),
             TriviaAnswer(
                 text = "Eating at Local Restaurants",
-                imageName = "Eatingatlocalrestaurants",
+                imageName = "eatingatlocalrestaurants",
                 explanation = "Eating at local restaurants allows tourists to engage with the local culture, support sustainable food practices, and contribute to the economic development of the local community."
             ),
             TriviaAnswer(
