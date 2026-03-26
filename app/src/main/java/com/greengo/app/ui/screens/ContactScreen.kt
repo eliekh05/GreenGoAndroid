@@ -225,12 +225,11 @@ fun ContactScreen(vm: AppStateViewModel) {
             }
 
             // Mailto link
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 30.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("You can also reach us at: ", fontSize = ws.captionSp.sp, color = theme.text.copy(alpha = 0.65f))
+                Text("You can also reach us at:", fontSize = ws.captionSp.sp, color = theme.text.copy(alpha = 0.65f))
                 TextButton(
                     onClick = {
                         val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:$toAddress"))

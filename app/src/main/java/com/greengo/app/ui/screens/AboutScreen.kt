@@ -83,6 +83,7 @@ fun AboutScreen(vm: AppStateViewModel) {
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = ws.contentPadding)
+                .navigationBarsPadding()
         ) {
             Spacer(modifier = Modifier.height(20.dp))
 

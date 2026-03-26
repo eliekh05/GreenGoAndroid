@@ -62,7 +62,7 @@ fun HomeScreen(vm: AppStateViewModel) {
                 .verticalScroll(rememberScrollState())
         ) {
             // Space for pinned header
-            Spacer(modifier = Modifier.height(ws.buttonHeight + ws.cardSpacing).statusBarsPadding())
+            Spacer(modifier = Modifier.statusBarsPadding().height(ws.buttonHeight + ws.cardSpacing * 2))
 
             Column(
                 modifier = Modifier

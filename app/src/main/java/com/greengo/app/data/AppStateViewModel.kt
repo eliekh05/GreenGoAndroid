@@ -52,7 +52,18 @@ class AppStateViewModel : ViewModel() {
     private val _screen = MutableStateFlow<Screen>(Screen.Splash)
     val screen: StateFlow<Screen> = _screen.asStateFlow()
 
-    fun navigate(screen: Screen) { _screen.value = screen }
+    private val backStack = mutableListOf<Screen>()
+
+    fun navigate(screen: Screen) {
+        backStack.add(_screen.value)
+        _screen.value = screen
+    }
+
+    fun navigateBack() {
+        if (backStack.isNotEmpty()) {
+            _screen.value = backStack.removeLast()
+        }
+    }
 
     // ── Theme ─────────────────────────────────────────────────────────────────
 

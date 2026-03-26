@@ -173,6 +173,9 @@ fun PedometerScreen(vm: AppStateViewModel) {
             Spacer(modifier = Modifier.height(0.dp))
 
             // Walking figure (animated when running)
+            val pedResId = remember {
+                context.resources.getIdentifier("pedometer", "drawable", context.packageName)
+            }
             Box(
                 modifier = Modifier
                     .size(130.dp)
@@ -188,12 +191,21 @@ fun PedometerScreen(vm: AppStateViewModel) {
                     color = green.copy(alpha = 0.10f),
                     modifier = Modifier.fillMaxSize()
                 ) {}
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.DirectionsWalk,
-                    contentDescription = null,
-                    tint = green,
-                    modifier = Modifier.size(ws.tileIconSize)
-                )
+                if (pedResId != 0) {
+                    Image(
+                        painter = painterResource(id = pedResId),
+                        contentDescription = null,
+                        modifier = Modifier.size(ws.tileIconSize),
+                        contentScale = ContentScale.Fit
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.DirectionsWalk,
+                        contentDescription = null,
+                        tint = green,
+                        modifier = Modifier.size(ws.tileIconSize)
+                    )
+                }
             }
 
             // Stats grid — 3 columns

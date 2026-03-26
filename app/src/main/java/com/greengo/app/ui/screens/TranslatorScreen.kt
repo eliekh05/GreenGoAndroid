@@ -71,91 +71,60 @@ private suspend fun googleTranslateFree(text: String, targetLang: String): Strin
     }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MARK: - Full Google Translate language list (BCP-47 codes)
+// MARK: - Language list — fetched dynamically from Google Translate API
+// Endpoint: translate.googleapis.com/translate_a/l?client=gtx&hl=en
+// Response: {"sl":{...},"tl":{"af":"Afrikaans","sq":"Albanian",...}}
+// No API key required.
 // ─────────────────────────────────────────────────────────────────────────────
 
 private data class LangEntry(val name: String, val code: String, val bcp47: String)
 
-private val languages = listOf(
-    LangEntry("Afrikaans",            "af",    "af-ZA"),
-    LangEntry("Albanian",             "sq",    "sq-AL"),
-    LangEntry("Amharic",              "am",    "am-ET"),
-    LangEntry("Arabic",               "ar",    "ar-SA"),
-    LangEntry("Armenian",             "hy",    "hy-AM"),
-    LangEntry("Azerbaijani",          "az",    "az-AZ"),
-    LangEntry("Basque",               "eu",    "eu-ES"),
-    LangEntry("Belarusian",           "be",    "be-BY"),
-    LangEntry("Bengali",              "bn",    "bn-BD"),
-    LangEntry("Bosnian",              "bs",    "bs-BA"),
-    LangEntry("Bulgarian",            "bg",    "bg-BG"),
-    LangEntry("Catalan",              "ca",    "ca-ES"),
-    LangEntry("Chinese Simplified",   "zh-CN", "zh-CN"),
-    LangEntry("Chinese Traditional",  "zh-TW", "zh-TW"),
-    LangEntry("Croatian",             "hr",    "hr-HR"),
-    LangEntry("Czech",                "cs",    "cs-CZ"),
-    LangEntry("Danish",               "da",    "da-DK"),
-    LangEntry("Dutch",                "nl",    "nl-NL"),
-    LangEntry("Estonian",             "et",    "et-EE"),
-    LangEntry("Filipino",             "tl",    "fil-PH"),
-    LangEntry("Finnish",              "fi",    "fi-FI"),
-    LangEntry("French",               "fr",    "fr-FR"),
-    LangEntry("Galician",             "gl",    "gl-ES"),
-    LangEntry("Georgian",             "ka",    "ka-GE"),
-    LangEntry("German",               "de",    "de-DE"),
-    LangEntry("Greek",                "el",    "el-GR"),
-    LangEntry("Gujarati",             "gu",    "gu-IN"),
-    LangEntry("Haitian Creole",       "ht",    "ht-HT"),
-    LangEntry("Hebrew",               "iw",    "he-IL"),
-    LangEntry("Hindi",                "hi",    "hi-IN"),
-    LangEntry("Hungarian",            "hu",    "hu-HU"),
-    LangEntry("Icelandic",            "is",    "is-IS"),
-    LangEntry("Indonesian",           "id",    "id-ID"),
-    LangEntry("Irish",                "ga",    "ga-IE"),
-    LangEntry("Italian",              "it",    "it-IT"),
-    LangEntry("Japanese",             "ja",    "ja-JP"),
-    LangEntry("Kannada",              "kn",    "kn-IN"),
-    LangEntry("Kazakh",               "kk",    "kk-KZ"),
-    LangEntry("Khmer",                "km",    "km-KH"),
-    LangEntry("Korean",               "ko",    "ko-KR"),
-    LangEntry("Lao",                  "lo",    "lo-LA"),
-    LangEntry("Latvian",              "lv",    "lv-LV"),
-    LangEntry("Lithuanian",           "lt",    "lt-LT"),
-    LangEntry("Macedonian",           "mk",    "mk-MK"),
-    LangEntry("Malay",                "ms",    "ms-MY"),
-    LangEntry("Malayalam",            "ml",    "ml-IN"),
-    LangEntry("Maltese",              "mt",    "mt-MT"),
-    LangEntry("Marathi",              "mr",    "mr-IN"),
-    LangEntry("Mongolian",            "mn",    "mn-MN"),
-    LangEntry("Nepali",               "ne",    "ne-NP"),
-    LangEntry("Norwegian",            "no",    "no-NO"),
-    LangEntry("Persian",              "fa",    "fa-IR"),
-    LangEntry("Polish",               "pl",    "pl-PL"),
-    LangEntry("Portuguese",           "pt",    "pt-BR"),
-    LangEntry("Punjabi",              "pa",    "pa-IN"),
-    LangEntry("Romanian",             "ro",    "ro-RO"),
-    LangEntry("Russian",              "ru",    "ru-RU"),
-    LangEntry("Serbian",              "sr",    "sr-RS"),
-    LangEntry("Sinhala",              "si",    "si-LK"),
-    LangEntry("Slovak",               "sk",    "sk-SK"),
-    LangEntry("Slovenian",            "sl",    "sl-SI"),
-    LangEntry("Somali",               "so",    "so-SO"),
-    LangEntry("Spanish",              "es",    "es-ES"),
-    LangEntry("Swahili",              "sw",    "sw-KE"),
-    LangEntry("Swedish",              "sv",    "sv-SE"),
-    LangEntry("Tamil",                "ta",    "ta-IN"),
-    LangEntry("Telugu",               "te",    "te-IN"),
-    LangEntry("Thai",                 "th",    "th-TH"),
-    LangEntry("Turkish",              "tr",    "tr-TR"),
-    LangEntry("Ukrainian",            "uk",    "uk-UA"),
-    LangEntry("Urdu",                 "ur",    "ur-PK"),
-    LangEntry("Uzbek",                "uz",    "uz-UZ"),
-    LangEntry("Vietnamese",           "vi",    "vi-VN"),
-    LangEntry("Welsh",                "cy",    "cy-GB"),
-    LangEntry("Xhosa",                "xh",    "xh-ZA"),
-    LangEntry("Yiddish",              "yi",    "yi-001"),
-    LangEntry("Yoruba",               "yo",    "yo-NG"),
-    LangEntry("Zulu",                 "zu",    "zu-ZA")
+// Maps Google lang code -> BCP-47 locale for TTS (best-effort, falls back to code itself)
+private val bcp47Map = mapOf(
+    "af" to "af-ZA", "sq" to "sq-AL", "am" to "am-ET", "ar" to "ar-SA",
+    "hy" to "hy-AM", "az" to "az-AZ", "eu" to "eu-ES", "be" to "be-BY",
+    "bn" to "bn-BD", "bs" to "bs-BA", "bg" to "bg-BG", "ca" to "ca-ES",
+    "zh-CN" to "zh-CN", "zh-TW" to "zh-TW", "hr" to "hr-HR", "cs" to "cs-CZ",
+    "da" to "da-DK", "nl" to "nl-NL", "et" to "et-EE", "tl" to "fil-PH",
+    "fi" to "fi-FI", "fr" to "fr-FR", "gl" to "gl-ES", "ka" to "ka-GE",
+    "de" to "de-DE", "el" to "el-GR", "gu" to "gu-IN", "ht" to "ht-HT",
+    "iw" to "he-IL", "hi" to "hi-IN", "hu" to "hu-HU", "is" to "is-IS",
+    "id" to "id-ID", "ga" to "ga-IE", "it" to "it-IT", "ja" to "ja-JP",
+    "kn" to "kn-IN", "kk" to "kk-KZ", "km" to "km-KH", "ko" to "ko-KR",
+    "lo" to "lo-LA", "lv" to "lv-LV", "lt" to "lt-LT", "mk" to "mk-MK",
+    "ms" to "ms-MY", "ml" to "ml-IN", "mt" to "mt-MT", "mr" to "mr-IN",
+    "mn" to "mn-MN", "ne" to "ne-NP", "no" to "no-NO", "fa" to "fa-IR",
+    "pl" to "pl-PL", "pt" to "pt-BR", "pa" to "pa-IN", "ro" to "ro-RO",
+    "ru" to "ru-RU", "sr" to "sr-RS", "si" to "si-LK", "sk" to "sk-SK",
+    "sl" to "sl-SI", "so" to "so-SO", "es" to "es-ES", "sw" to "sw-KE",
+    "sv" to "sv-SE", "ta" to "ta-IN", "te" to "te-IN", "th" to "th-TH",
+    "tr" to "tr-TR", "uk" to "uk-UA", "ur" to "ur-PK", "uz" to "uz-UZ",
+    "vi" to "vi-VN", "cy" to "cy-GB", "xh" to "xh-ZA", "yi" to "yi-001",
+    "yo" to "yo-NG", "zu" to "zu-ZA"
 )
+
+private suspend fun fetchLanguages(): List<LangEntry> = withContext(Dispatchers.IO) {
+    try {
+        val request = Request.Builder()
+            .url("https://translate.googleapis.com/translate_a/l?client=gtx&hl=en")
+            .header("User-Agent", "Mozilla/5.0")
+            .get()
+            .build()
+        val response = httpClient.newCall(request).execute()
+        val body = response.body?.string() ?: return@withContext emptyList()
+        // Response: {"sl":{...},"tl":{"af":"Afrikaans",...}}
+        val obj  = org.json.JSONObject(body)
+        val tl   = obj.optJSONObject("tl") ?: return@withContext emptyList()
+        val list = mutableListOf<LangEntry>()
+        tl.keys().forEach { code ->
+            val name = tl.getString(code)
+            list.add(LangEntry(name = name, code = code, bcp47 = bcp47Map[code] ?: code))
+        }
+        list.sortedBy { it.name }
+    } catch (_: Exception) {
+        emptyList()
+    }
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MARK: - TranslatorScreen
@@ -165,8 +134,9 @@ private val languages = listOf(
 fun TranslatorScreen(vm: AppStateViewModel) {
     val ws      = rememberWindowSize()
     val theme   by vm.theme.collectAsState()
-    val context = LocalContext.current
-    val scope   = rememberCoroutineScope()
+    val context     = LocalContext.current
+    val scope       = rememberCoroutineScope()
+    val keyboardCtrl = LocalSoftwareKeyboardController.current
 
     var inputText      by remember { mutableStateOf("") }
     var translatedText by remember { mutableStateOf("") }
@@ -177,11 +147,20 @@ fun TranslatorScreen(vm: AppStateViewModel) {
     var isSpeaking     by remember { mutableStateOf(false) }
     var searchQuery    by remember { mutableStateOf("") }
 
-    val filteredLangs = remember(searchQuery) {
+    // Fetch language list dynamically from Google Translate API
+    var languages      by remember { mutableStateOf<List<LangEntry>>(emptyList()) }
+    var langsLoading   by remember { mutableStateOf(true) }
+    LaunchedEffect(Unit) {
+        val fetched = fetchLanguages()
+        languages    = fetched
+        langsLoading = false
+    }
+
+    val filteredLangs = remember(searchQuery, languages) {
         if (searchQuery.isBlank()) languages
         else languages.filter { it.name.contains(searchQuery, ignoreCase = true) }
     }
-    val currentLang = languages[selectedIndex]
+    val currentLang = languages.getOrNull(selectedIndex)
 
     // ── TTS ──────────────────────────────────────────────────────────────────
     var tts by remember { mutableStateOf<TextToSpeech?>(null) }
@@ -192,7 +171,7 @@ fun TranslatorScreen(vm: AppStateViewModel) {
     }
 
     fun speak(text: String) {
-        tts?.language = Locale.forLanguageTag(currentLang.bcp47)
+        tts?.language = Locale.forLanguageTag(currentLang?.bcp47 ?: "en")
         tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
         isSpeaking = true
     }
@@ -204,9 +183,10 @@ fun TranslatorScreen(vm: AppStateViewModel) {
 
     fun triggerTranslation(q: String = inputText.trim()) {
         if (q.isEmpty()) return
+        keyboardCtrl?.hide()
         isTranslating = true; errorMessage = null; translatedText = ""; stopSpeaking()
         scope.launch {
-            runCatching { googleTranslateFree(q, currentLang.code) }
+            runCatching { googleTranslateFree(q, currentLang?.code ?: "en") }
                 .onSuccess { result ->
                     translatedText = result
                     isTranslating  = false
@@ -281,6 +261,13 @@ fun TranslatorScreen(vm: AppStateViewModel) {
             // ── Language picker ───────────────────────────────────────────────
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text("Translate to", fontSize = ws.captionSp.sp, color = theme.mutedText)
+                // Loading indicator
+                if (langsLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.CenterHorizontally).size(24.dp),
+                        color = accentBlue, strokeWidth = 2.dp
+                    )
+                }
                 // Search box
                 TextField(
                     value = searchQuery,
@@ -318,7 +305,7 @@ fun TranslatorScreen(vm: AppStateViewModel) {
                         verticalArrangement   = Arrangement.spacedBy(6.dp)
                     ) {
                         items(filteredLangs) { lang ->
-                            val idx = languages.indexOf(lang)
+                            val idx = languages.indexOfFirst { it.code == lang.code }
                             val selected = idx == selectedIndex
                             Surface(
                                 onClick = {
@@ -327,6 +314,7 @@ fun TranslatorScreen(vm: AppStateViewModel) {
                                     errorMessage   = null
                                     searchQuery    = ""
                                     stopSpeaking()
+                                    keyboardCtrl?.hide()
                                 },
                                 shape = RoundedCornerShape(8.dp),
                                 color = if (selected) accentBlue else theme.cardBackground,
@@ -345,7 +333,7 @@ fun TranslatorScreen(vm: AppStateViewModel) {
                 }
                 // Selected language chip
                 Text(
-                    "Selected: ${currentLang.name}",
+                    "Selected: ${currentLang?.name ?: "Loading…"}",
                     fontSize = ws.captionSp.sp,
                     color    = accentBlue,
                     fontWeight = FontWeight.SemiBold
@@ -378,6 +366,8 @@ fun TranslatorScreen(vm: AppStateViewModel) {
                         unfocusedTextColor      = theme.text
                     ),
                     placeholder = { Text("Type text here…", color = theme.mutedText) },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { triggerTranslation() }),
                     shape = RoundedCornerShape(12.dp)
                 )
             }
@@ -433,7 +423,7 @@ fun TranslatorScreen(vm: AppStateViewModel) {
             if (translatedText.isNotEmpty()) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(currentLang.name,
+                        Text(currentLang?.name ?: "",
                             fontSize = ws.captionSp.sp,
                             color    = theme.text.copy(alpha = 0.7f))
                         Spacer(modifier = Modifier.weight(1f))

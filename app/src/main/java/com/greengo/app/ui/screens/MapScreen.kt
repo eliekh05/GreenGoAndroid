@@ -171,7 +171,7 @@ private suspend fun fetchMarkers(lat: Double, lon: Double, radiusKm: Double): Li
                     )
                 }
                 return@withContext out
-            } catch (_: Exception) { delay(300) }
+            } catch (_: Exception) { delay(100) }
         }
         emptyList()
     }
@@ -308,7 +308,7 @@ fun MapScreen(vm: AppStateViewModel) {
                             val center = mapCenter
                             regionJob?.cancel()
                             regionJob = scope.launch {
-                                delay(700)
+                                delay(100)
                                 isLoading = true
                                 val result = runCatching {
                                     fetchMarkers(center.latitude, center.longitude, 80.0)
@@ -360,7 +360,7 @@ fun MapScreen(vm: AppStateViewModel) {
                                     if (q.length >= 3) {
                                         regionJob?.cancel()
                                         regionJob = scope.launch {
-                                            delay(600)
+                                            delay(200)
                                             val coord = geocode(q) ?: return@launch
                                             jumpTo(coord.first, coord.second, 12.0)
                                             isLoading = true

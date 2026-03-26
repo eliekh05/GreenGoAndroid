@@ -96,7 +96,7 @@ fun GamesScreen(vm: AppStateViewModel) {
             GameCard(
                 title       = "Eco Trivia",
                 sub         = "5-round quiz on sustainable travel",
-                bannerImage = "Europetrafic",
+                bannerImage = "europetrafic",
                 color       = Color(red = 0.08f, green = 0.42f, blue = 0.14f),
                 score       = triviaScore,
                 theme       = theme
