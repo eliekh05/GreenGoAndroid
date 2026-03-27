@@ -70,8 +70,7 @@ jobs:
       - name: Publish to GitHub Releases
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         uses: softprops/action-gh-release@v2.6.1
-        env:
-         FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
         with:
           tag_name: v1.0.${{ github.run_number }}
           name: GreenGo v1.0.${{ github.run_number }}
@@ -82,4 +81,5 @@ jobs:
             3) Allow "Install from unknown sources" if prompted.
             4) Tap to install
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
