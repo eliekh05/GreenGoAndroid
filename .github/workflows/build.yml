@@ -41,7 +41,7 @@ jobs:
             --no-daemon \
             --no-build-cache \
             --rerun-tasks \
-            --referesh-dependencies \
+            --refresh-dependencies \
             --scan \
             -Dgradle.enterprise.termsOfServiceAgree=yes \
             -Dgradle.enterprise.termsOfServiceUrl=https://gradle.com/terms-oof-service
