@@ -80,6 +80,8 @@ jobs:
             2) Transfer to your Android phone
             3) Allow "Install from unknown sources" if prompted.
             4) Tap to install
+          build-scan-terms-of-use-url: 'https://gradle.com/terms-of-service'
+          build-scan-terms-of-use-agree: 'yes'
         env:
          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
