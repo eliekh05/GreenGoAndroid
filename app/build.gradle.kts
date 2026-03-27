@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("org.sonarqube") version "7.2.3.7755"
 }
 
 android {
@@ -45,6 +46,13 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.10.5"
     }
+}
+
+sonar {
+  properties {
+    property("sonar.projectkey", "eliekh05_GreenGoAndroid")
+    property("sonar.organization", "eliekh05")
+  }
 }
 
 dependencies {
