@@ -28,6 +28,7 @@ jobs:
           gradle-version: '9.4.1'
           build-scan-terms-of-use-url: 'https://gradle.com/terms-of-service'
           build-scan-terms-of-use-agree: 'yes'
+
       - name: Validation
         uses: gradle/actions/wrapper-validation@v5
 
@@ -35,7 +36,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build release APK (unsigned)
-        run: ./gradlew assembleRelease
+        run: ./gradlew clean assembleRelease --no-build-cache --rerun-tasks --refresh-dependencies
 
       - name: Sign and copy APK
         env:
@@ -68,7 +69,7 @@ jobs:
 
       - name: Publish to GitHub Releases
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.6.1
         with:
           tag_name: v1.0.${{ github.run_number }}
           name: GreenGo v1.0.${{ github.run_number }}
