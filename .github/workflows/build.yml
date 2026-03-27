@@ -36,10 +36,15 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build release APK (unsigned)
-        with:
-         build-scan-terms-of-use-url: 'https://gradle.com/terms-of-service'
-         build-scan-terms-of-use-agree: 'yes'
-        run: ./gradlew clean assembleRelease --no-daemon --no-build-cache --rerun-tasks --refresh-dependencies --scan
+        run: |
+          ./gradlew clean assembleRelease \
+            --no-daemon \
+            --no-build-cache \
+            --return-tasks \
+            --referesh-dependencies \
+            --scan \
+            -Dgradle.enterprise.termsOfServiceAgree=yes \
+            -Dgradle.enterprise.termsOfServiceUrl=https://gradle.com/terms-oof-service
         env:
          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       - name: Sign and copy APK
