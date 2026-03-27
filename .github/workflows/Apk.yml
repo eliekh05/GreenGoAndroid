@@ -24,6 +24,8 @@ jobs:
         uses: gradle/actions/setup-gradle@main
         with:
           gradle-version: '9.4.1'
+          build-scan-terms-of-use-url: 'https://gradle.com/terms-of-service'
+          build-scan-terms-of-use-agree: 'yes'
 
       - name: Validation
         uses: gradle/actions/wrapper-validation@main
