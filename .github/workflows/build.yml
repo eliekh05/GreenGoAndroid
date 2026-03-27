@@ -36,7 +36,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build release APK (unsigned)
-        run: ./gradlew clean assembleRelease --no-build-cache --rerun-tasks --refresh-dependencies
+        run: ./gradlew clean assembleRelease --no-daemon --no-build-cache --rerun-tasks --refresh-dependencies --scan
 
       - name: Sign and copy APK
         env:
@@ -70,6 +70,8 @@ jobs:
       - name: Publish to GitHub Releases
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         uses: softprops/action-gh-release@v2.6.1
+        env:
+         FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         with:
           tag_name: v1.0.${{ github.run_number }}
           name: GreenGo v1.0.${{ github.run_number }}
