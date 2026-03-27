@@ -46,18 +46,10 @@ jobs:
         run: |
          sdkmanager tools platform-tools
 
-      - name: Check signing secrets
-        id: check_secrets
-        run: |
-          if [ -n "${{ secrets.SIGNING_KEY }}" ]; then
-            echo "SIGNING_KEY_SET=true" >> $GITHUB_ENV
-          else
-            echo "SIGNING_KEY_SET=false" >> $GITHUB_ENV
-          fi
-
-      - uses: ilharp/sign-android-release@v2 # Or use @nightly
-        name: Sign app APK
+      - name: Sign app APK
         id: sign_app
+        if: ${{ secrets.SIGNING_KEY != '' }}
+        uses: ilharp/sign-android-release@v2
         with:
           releaseDir: app/build/outputs/apk/release
           signingKey: ${{ secrets.SIGNING_KEY }}
@@ -66,15 +58,17 @@ jobs:
           keyPassword: ${{ secrets.KEY_PASSWORD }}
           buildToolsVersion: 36.0.0
 
-      - name: Copy APK (signed if available, otherwise unsigned)
+      - name: Copy signed APK
+        if: ${{ secrets.SIGNING_KEY != '' }}
         run: |
-          if [ -f "${{ steps.sign_app.outputs.signedReleaseFile }}" ]; then
-            cp "${{ steps.sign_app.outputs.signedReleaseFile }}" GreenGo.apk
-            echo "Using signed APK"
-          else
-            cp app/build/outputs/apk/release/app-release-unsigned.apk GreenGo.apk
-            echo "Using unsigned APK (no signing secrets set)"
-          fi
+          cp "${{ steps.sign_app.outputs.signedReleaseFile }}" GreenGo.apk
+          echo "Using signed APK: ${{ steps.sign_app.outputs.signedReleaseFile }}"
+
+      - name: Copy unsigned APK
+        if: ${{ secrets.SIGNING_KEY == '' }}
+        run: |
+          cp app/build/outputs/apk/release/app-release-unsigned.apk GreenGo.apk
+          echo "Using unsigned APK (no signing secrets set)"
 
       - name: Verify APK exists
         run: test -f GreenGo.apk && echo "APK ready" || (echo "APK missing" && exit 1)
