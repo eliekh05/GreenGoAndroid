@@ -43,8 +43,6 @@ jobs:
             --rerun-tasks \
             --refresh-dependencies \
             --scan \
-            -Dgradle.enterprise.termsOfServiceAgree=yes \
-            -Dgradle.enterprise.termsOfServiceUrl=https://gradle.com/help/legal-terms-of-use
         env:
          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       - name: Sign and copy APK
