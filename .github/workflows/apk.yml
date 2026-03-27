@@ -34,11 +34,6 @@ jobs:
       - name: Build release APK (unsigned)
         run: ./gradlew assembleRelease
 
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v6
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
       - name: Sign and copy APK
         env:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
