@@ -39,35 +39,30 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Setup Android SDK Tools
-        uses: android-actions/setup-android@v3.2.2
-
-      - name: Android platform tools
+      - name: Sign and copy APK
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-         sdkmanager tools platform-tools
-
-      - name: Sign app APK
-        id: sign_app
-        if: ${{ secrets.SIGNING_KEY != '' }}
-        uses: ilharp/sign-android-release@v2
-        with:
-          releaseDir: app/build/outputs/apk/release
-          signingKey: ${{ secrets.SIGNING_KEY }}
-          keyAlias: ${{ secrets.KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
-          buildToolsVersion: 36.0.0
-
-      - name: Copy APK for release
-        run: |
-          # Prefer signed APK (ends in -signed.apk), fall back to unsigned
-          SIGNED=$(ls app/build/outputs/apk/release/*-signed.apk 2>/dev/null | head -1)
-          if [ -n "$SIGNED" ]; then
-            cp "$SIGNED" GreenGo.apk
-            echo "✅ Using signed APK: $SIGNED"
+          UNSIGNED=app/build/outputs/apk/release/app-release-unsigned.apk
+          if [ -n "$SIGNING_KEY" ]; then
+            echo "🔑 Signing APK..."
+            echo "$SIGNING_KEY" | base64 -d > keystore.jks
+            APKSIGNER=$(find $ANDROID_SDK_ROOT/build-tools -name apksigner | sort -V | tail -1)
+            "$APKSIGNER" sign \
+              --ks keystore.jks \
+              --ks-key-alias "$KEY_ALIAS" \
+              --ks-pass pass:"$KEY_STORE_PASSWORD" \
+              --key-pass pass:"$KEY_PASSWORD" \
+              --out GreenGo.apk \
+              "$UNSIGNED"
+            rm -f keystore.jks
+            echo "✅ Signed APK ready"
           else
-            cp app/build/outputs/apk/release/app-release-unsigned.apk GreenGo.apk
-            echo "⚠️ Using unsigned APK"
+            cp "$UNSIGNED" GreenGo.apk
+            echo "⚠️ No signing key — using unsigned APK"
           fi
 
       - name: Verify APK exists
