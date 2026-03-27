@@ -58,17 +58,17 @@ jobs:
           keyPassword: ${{ secrets.KEY_PASSWORD }}
           buildToolsVersion: 36.0.0
 
-      - name: Copy signed APK
-        if: ${{ secrets.SIGNING_KEY != '' }}
+      - name: Copy APK for release
         run: |
-          cp "${{ steps.sign_app.outputs.signedReleaseFile }}" GreenGo.apk
-          echo "Using signed APK: ${{ steps.sign_app.outputs.signedReleaseFile }}"
-
-      - name: Copy unsigned APK
-        if: ${{ secrets.SIGNING_KEY == '' }}
-        run: |
-          cp app/build/outputs/apk/release/app-release-unsigned.apk GreenGo.apk
-          echo "Using unsigned APK (no signing secrets set)"
+          # Prefer signed APK (ends in -signed.apk), fall back to unsigned
+          SIGNED=$(ls app/build/outputs/apk/release/*-signed.apk 2>/dev/null | head -1)
+          if [ -n "$SIGNED" ]; then
+            cp "$SIGNED" GreenGo.apk
+            echo "✅ Using signed APK: $SIGNED"
+          else
+            cp app/build/outputs/apk/release/app-release-unsigned.apk GreenGo.apk
+            echo "⚠️ Using unsigned APK"
+          fi
 
       - name: Verify APK exists
         run: test -f GreenGo.apk && echo "APK ready" || (echo "APK missing" && exit 1)
