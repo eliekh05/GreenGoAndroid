@@ -58,7 +58,9 @@ fun PreferencesScreen(vm: AppStateViewModel) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(ws.cardInnerPadding),
+                .verticalScroll(rememberScrollState())
+                .padding(ws.cardInnerPadding)
+                .navigationBarsPadding(),
             verticalArrangement = Arrangement.spacedBy(ws.cardSpacing)
         ) {
             // Appearance
@@ -179,7 +181,9 @@ fun SettingsScreen(vm: AppStateViewModel) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(ws.cardInnerPadding),
+                .verticalScroll(rememberScrollState())
+                .padding(ws.cardInnerPadding)
+                .navigationBarsPadding(),
             verticalArrangement = Arrangement.spacedBy(ws.cardSpacing)
         ) {
             // Appearance

@@ -9,6 +9,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.layout.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greengo.app.data.AppStateViewModel
 import com.greengo.app.data.AppTheme
 import com.greengo.app.data.Screen
@@ -50,7 +52,7 @@ data class MemCard(
 // MARK: - WildRecallGame ViewModel
 // ─────────────────────────────────────────────────────────────────────────────
 
-class WildRecallGame {
+class WildRecallGame : ViewModel() {
     companion object {
         val allPairs   = listOf("a1","a2","a3","a4","a5","a6","a7","a8")
         const val pairsPerGame = 6
@@ -130,8 +132,8 @@ class WildRecallGame {
 fun WildRecallScreen(vm: AppStateViewModel) {
     val theme by vm.theme.collectAsState()
     val ws = rememberWindowSize()
-    val game  = remember { WildRecallGame() }
-    val scope = rememberCoroutineScope()
+    val game  = viewModel<WildRecallGame>()
+    val scope = rememberCoroutineScope()  // used for UI only; game uses viewModelScope
 
     LaunchedEffect(game.gameOver) {
         if (game.gameOver) vm.saveMemoryScore(game.score)

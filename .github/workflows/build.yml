@@ -26,8 +26,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v5.0.2
         with:
           gradle-version: '9.4.1'
-          build-scan-terms-of-use-url: 'https://gradle.com/terms-of-service'
-          build-scan-terms-of-use-agree: 'yes'
 
       - name: Validation
         uses: gradle/actions/wrapper-validation@v5
@@ -36,15 +34,8 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build release APK (unsigned)
-        run: |
-          ./gradlew clean assembleRelease \
-            --no-daemon \
-            --no-build-cache \
-            --rerun-tasks \
-            --refresh-dependencies \
-            --scan \
-        env:
-         FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+        run: ./gradlew assembleRelease
+
       - name: Sign and copy APK
         env:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
@@ -77,7 +68,6 @@ jobs:
       - name: Publish to GitHub Releases
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         uses: softprops/action-gh-release@v2.6.1
-
         with:
           tag_name: v1.0.${{ github.run_number }}
           name: GreenGo v1.0.${{ github.run_number }}
@@ -88,4 +78,4 @@ jobs:
             3) Allow "Install from unknown sources" if prompted.
             4) Tap to install
         env:
-         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

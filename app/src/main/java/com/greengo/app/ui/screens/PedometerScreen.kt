@@ -174,7 +174,7 @@ fun PedometerScreen(vm: AppStateViewModel) {
 
             // Walking figure (animated when running)
             val pedResId = remember {
-                context.resources.getIdentifier("pedometer", "drawable", context.packageName)
+                context.resources.getIdentifier("stickman", "drawable", context.packageName)
             }
             Box(
                 modifier = Modifier
