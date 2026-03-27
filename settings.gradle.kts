@@ -1,14 +1,3 @@
-plugins {
-    id("com.gradle.develocity") version("4.4.0")
-}
-
-develocity {
-    buildScan {
-        termsOfUseUrl.set("https://gradle.com/help/legal-terms-of-use")
-        termsOfUseAgree.set("yes")
-    }
-}
-
 pluginManagement {
     repositories {
         google {
@@ -20,6 +9,17 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+    }
+}
+
+plugins {
+    id("com.gradle.develocity") version("4.4.0")
+}
+
+develocity {
+    buildScan {
+        termsOfUseUrl.set("https://gradle.com/help/legal-terms-of-use")
+        termsOfUseAgree.set("yes")
     }
 }
 
