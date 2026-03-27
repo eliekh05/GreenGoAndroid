@@ -1,14 +1,6 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.plugin.compose")
-    id("org.sonarqube") version "4.4.1.3373"
-}
-
-sonar {
-  properties {
-    property("sonar.projectkey", "eliekh05_GreenGoAndroid")
-    property("sonar.organization", "eliekh05")
-  }
 }
 
 android {
