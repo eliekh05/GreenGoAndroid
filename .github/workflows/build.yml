@@ -40,7 +40,7 @@ jobs:
           ./gradlew clean assembleRelease \
             --no-daemon \
             --no-build-cache \
-            --return-tasks \
+            --rerun-tasks \
             --referesh-dependencies \
             --scan \
             -Dgradle.enterprise.termsOfServiceAgree=yes \
