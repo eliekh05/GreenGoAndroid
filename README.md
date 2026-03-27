@@ -2,6 +2,10 @@
 
 An eco-friendly travel app for Android built with Kotlin, Jetpack Compose, and Android 8+.
 
+## Github Actions Status
+
+[![Build GreenGo APK](https://github.com/eliekh05/GreenGoAndroid/actions/workflows/build.yml/badge.svg)](https://github.com/eliekh05/GreenGoAndroid/actions/workflows/build.yml)
+
 ## Setup
 
 1. Go to the [Releases](../../releases) section of this repo
