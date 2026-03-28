@@ -21,7 +21,7 @@ To revert it: **Settings → Security → Auto Blocker → turn On**
 
 **Google Play Protect warning:**
 Because this app is not on the Play Store, Play Protect will show a warning.
-To install: tap **More details** → **Install anyway**
+To install: tap **More details** → **Install anyway** or **Install without scanning**
 
 
 **PIN / biometric prompt:**
