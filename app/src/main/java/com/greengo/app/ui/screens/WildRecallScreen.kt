@@ -62,8 +62,9 @@ class WildRecallGame {
     var gameOver   by mutableStateOf(false)
     var totalPairs by mutableStateOf(pairsPerGame)
 
-    private var flippedIDs = mutableListOf<UUID>()
-    private var busy = false
+    // Use mutableStateListOf so Compose observes changes — plain mutableListOf causes stale reads
+    private val flippedIDs = androidx.compose.runtime.mutableStateListOf<UUID>()
+    @Volatile private var busy = false
 
     init { deal() }
 
@@ -100,6 +101,7 @@ class WildRecallGame {
 
     private fun evaluatePair() {
         val ids = flippedIDs.toList()
+        if (ids.size < 2) { flippedIDs.clear(); busy = false; return }
         val i0 = cards.indexOfFirst { it.id == ids[0] }
         val i1 = cards.indexOfFirst { it.id == ids[1] }
         if (i0 < 0 || i1 < 0) { flippedIDs.clear(); busy = false; return }
