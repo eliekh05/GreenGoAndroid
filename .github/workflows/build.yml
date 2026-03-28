@@ -73,9 +73,18 @@ jobs:
           name: GreenGo v1.0.${{ github.run_number }}
           files: GreenGo.apk
           body: |
-            1) Download **GreenGo.apk** below
-            2) Transfer to your Android phone
-            3) Allow "Install from unknown sources" if prompted.
-            4) Tap to install
+            ## Install Instructions
+
+            1. Download **GreenGo.apk** below
+            2. Transfer to your Android phone
+
+            ### ⚠️ Auto Blocker (Samsung / newer Android)
+            Settings → Security → Auto Blocker → turn **Off**
+
+            ### ⚠️ Google Play Protect warning
+            Tap **More details** → **Install anyway**
+
+            ### ⚠️ PIN / biometric prompt
+            Some devices ask for your PIN to confirm — enter it to proceed.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

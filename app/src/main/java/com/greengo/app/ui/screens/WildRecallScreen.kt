@@ -95,12 +95,12 @@ class WildRecallGame : ViewModel() {
             busy = true
             scope.launch {
                 delay(750)
-                check()
+                checkPair()
             }
         }
     }
 
-    private fun check() {
+    private fun checkPair() {
         val ids = flippedIDs.toList()
         val i0 = cards.indexOfFirst { it.id == ids[0] }
         val i1 = cards.indexOfFirst { it.id == ids[1] }

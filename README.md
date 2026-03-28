@@ -1,16 +1,26 @@
-# GreenGo 🌿
+# GreenGo Android
 
-An eco-friendly travel app for Android built with Kotlin, Jetpack Compose, and Android 8+.
+Eco-friendly travel companion app — Android port of the iOS GreenGo app.
 
-## Github Actions Status
+## Install the APK
 
-[![Build GreenGo APK](https://github.com/eliekh05/GreenGoAndroid/actions/workflows/build.yml/badge.svg)](https://github.com/eliekh05/GreenGoAndroid/actions/workflows/build.yml)
+1. Go to [Releases](https://github.com/eliekh05/GreenGoAndroid/releases) and download the latest `GreenGo.apk`
+2. Transfer the APK to your Android phone
+3. Open the file to install
 
-## Setup
+### ⚠️ Installation Notes
 
-1. Go to the [Releases](../../releases) section of this repo
-2. Download **GreenGo.apk**
-3. Transfer to your Android phone
-4. Tap to install — allow "Install from unknown sources" if prompted
+**Auto-blocker (Samsung & newer Android):**
+Samsung devices and some newer Android versions have an "Auto Blocker" that prevents installing APKs from outside the Play Store.
+To disable it: **Settings → Security → Auto Blocker → turn Off**
 
-FULL README AND LICENSE CHECK [README](https://github.com/eliekh05/GreenGo/blob/main/README.md)
+**Google Play Protect warning:**
+Because this app is not on the Play Store, Play Protect will show a warning.
+To install: tap **More details** → **Install anyway**
+
+**PIN / biometric prompt:**
+Some devices require your PIN or fingerprint to confirm installation of sideloaded APKs. This is normal — enter your PIN to proceed.
+
+## Build
+
+The APK is built and signed automatically via GitHub Actions on every push to `main`.
