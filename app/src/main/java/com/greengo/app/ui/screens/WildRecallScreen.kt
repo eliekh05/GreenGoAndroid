@@ -9,8 +9,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.layout.*
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greengo.app.data.AppStateViewModel
 import com.greengo.app.data.AppTheme
 import com.greengo.app.data.Screen
@@ -49,10 +47,10 @@ data class MemCard(
 )
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MARK: - WildRecallGame ViewModel
+// MARK: - WildRecallGame  (plain class held in remember{} — mirrors iOS @StateObject)
 // ─────────────────────────────────────────────────────────────────────────────
 
-class WildRecallGame : ViewModel() {
+class WildRecallGame {
     companion object {
         val allPairs   = listOf("a1","a2","a3","a4","a5","a6","a7","a8")
         const val pairsPerGame = 6
@@ -95,12 +93,12 @@ class WildRecallGame : ViewModel() {
             busy = true
             scope.launch {
                 delay(750)
-                checkPair()
+                evaluatePair()
             }
         }
     }
 
-    private fun checkPair() {
+    private fun evaluatePair() {
         val ids = flippedIDs.toList()
         val i0 = cards.indexOfFirst { it.id == ids[0] }
         val i1 = cards.indexOfFirst { it.id == ids[1] }
@@ -132,8 +130,8 @@ class WildRecallGame : ViewModel() {
 fun WildRecallScreen(vm: AppStateViewModel) {
     val theme by vm.theme.collectAsState()
     val ws = rememberWindowSize()
-    val game  = viewModel<WildRecallGame>()
-    val scope = rememberCoroutineScope()  // used for UI only; game uses viewModelScope
+    val game  = remember { WildRecallGame() }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(game.gameOver) {
         if (game.gameOver) vm.saveMemoryScore(game.score)
@@ -206,8 +204,8 @@ fun WildRecallScreen(vm: AppStateViewModel) {
 
 @Composable
 private fun MemCardView(card: MemCard, theme: AppTheme, onClick: () -> Unit) {
-        val ws = rememberWindowSize()
-        val context = LocalContext.current
+    val ws = rememberWindowSize()
+    val context = LocalContext.current
     val faceResId = remember(card.imgName) {
         context.resources.getIdentifier(card.imgName, "drawable", context.packageName)
     }
@@ -230,7 +228,6 @@ private fun MemCardView(card: MemCard, theme: AppTheme, onClick: () -> Unit) {
             .clickable(enabled = !card.flipped && !card.matched) { onClick() }
     ) {
         if (isFront) {
-            // Face (animal image)
             if (faceResId != 0) {
                 Image(
                     painter = painterResource(id = faceResId),
@@ -241,15 +238,7 @@ private fun MemCardView(card: MemCard, theme: AppTheme, onClick: () -> Unit) {
             } else {
                 Box(modifier = Modifier.fillMaxSize().background(theme.accent.copy(alpha = 0.3f)))
             }
-            // Matched border
-            if (card.matched) {
-                Box(modifier = Modifier.fillMaxSize()
-                    .then(Modifier.clip(RoundedCornerShape(10.dp)))
-                    .background(Color.Transparent))
-                // Compose doesn't have a direct overlay border in Box — use Surface stroke workaround
-            }
         } else {
-            // Back
             if (backResId != 0) {
                 Image(
                     painter = painterResource(id = backResId),
@@ -320,7 +309,7 @@ private fun WinOverlay(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MARK: - Wild Recall custom nav bar (uses "GameOfSquids" style title)
+// MARK: - Wild Recall custom nav bar
 // ─────────────────────────────────────────────────────────────────────────────
 
 @Composable
