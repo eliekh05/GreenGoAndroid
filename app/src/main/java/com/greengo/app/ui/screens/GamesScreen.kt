@@ -196,10 +196,11 @@ fun MemoryInfoScreen(vm: AppStateViewModel) {
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
                 .padding(ws.cardInnerPadding)
-                .padding(bottom = 24.dp),
+                .padding(bottom = 24.dp)
+                .navigationBarsPadding(),
             verticalArrangement = Arrangement.spacedBy(ws.cardSpacing)
         ) {
             BackBtn(onClick = { vm.navigate(Screen.Games) })
