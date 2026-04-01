@@ -1,27 +1,13 @@
 package com.greengo.app.ui.components
 
-import androidx.compose.runtime.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.ui.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.coerceIn
+import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.lazy.grid.*
-import androidx.compose.ui.draw.*
-import androidx.compose.ui.geometry.*
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.input.pointer.*
-import androidx.compose.ui.layout.*
-import androidx.compose.ui.platform.*
-import androidx.compose.ui.res.*
-import androidx.compose.ui.text.input.*
-import androidx.compose.ui.text.style.*
-import androidx.compose.ui.unit.*
-import androidx.compose.ui.viewinterop.*
-import androidx.compose.foundation.shape.*
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.automirrored.filled.*
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MARK: - WindowSize

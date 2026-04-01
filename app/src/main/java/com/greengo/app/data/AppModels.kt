@@ -1,25 +1,6 @@
 package com.greengo.app.data
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.lazy.grid.*
-import androidx.compose.ui.draw.*
-import androidx.compose.ui.geometry.*
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.input.pointer.*
-import androidx.compose.ui.layout.*
-import androidx.compose.ui.platform.*
-import androidx.compose.ui.res.*
-import androidx.compose.ui.text.input.*
-import androidx.compose.ui.text.style.*
-import androidx.compose.ui.unit.*
-import androidx.compose.ui.viewinterop.*
-import androidx.compose.foundation.shape.*
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.automirrored.filled.*
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MARK: - Navigation
@@ -95,6 +76,6 @@ enum class AppTheme(val rawValue: String) {
     val mutedText: Color get() = text.copy(alpha = 0.70f)
 
     companion object {
-        fun fromRawValue(raw: String) = values().firstOrNull { it.rawValue == raw } ?: MINT
+        fun fromRawValue(raw: String) = entries.firstOrNull { it.rawValue == raw } ?: MINT
     }
 }
