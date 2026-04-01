@@ -1,24 +1,24 @@
-// AGP 9.0+ provides built-in Kotlin — no need for kotlin-android plugin.
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
-    namespace   = "com.greengo.app"
-    compileSdk  = 36
+    namespace = "com.greengo.app"
+    compileSdk = 36
 
     defaultConfig {
-        applicationId             = "com.greengo.app"
-        minSdk                    = 26
-        targetSdk                 = 36
-        versionCode               = 1
-        versionName               = "1.0"
+        applicationId = "com.greengo.app"
+        minSdk = 26
+        targetSdk = 36
+        versionCode = 1
+        versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled   = false
+            isMinifyEnabled = false
             isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -41,11 +41,9 @@ android {
 }
 
 dependencies {
-    // Activity
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.activity.compose)
 
-    // Compose BOM — pins all Compose versions together
     val bom = platform(libs.androidx.compose.bom)
     implementation(bom)
     implementation(libs.androidx.ui)
@@ -55,17 +53,11 @@ dependencies {
     implementation(libs.androidx.runtime)
     implementation(libs.material.icons.extended)
 
-    // Networking (TranslatorScreen + ContactScreen)
     implementation(libs.okhttp)
-
-    // Map (MapScreen)
     implementation(libs.osmdroid.android)
-
-    // Video player (SplashScreen)
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.ui)
 
-    // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")

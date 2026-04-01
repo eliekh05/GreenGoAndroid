@@ -24,4 +24,4 @@ media3-ui                  = { group = "androidx.media3",            name = "med
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-# kotlin-android is NOT listed — AGP 9.0+ has built-in Kotlin, no plugin needed
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
