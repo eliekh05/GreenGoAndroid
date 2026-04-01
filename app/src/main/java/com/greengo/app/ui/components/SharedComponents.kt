@@ -41,15 +41,14 @@ val BluePrimary  = Color(red = 0.10f, green = 0.38f, blue = 0.82f)
 // ─────────────────────────────────────────────────────────────────────────────
 
 @Composable
-fun NavBar(
+fun Modifier.NavBar(
     title: String,
     onBack: () -> Unit,
     onHome: (() -> Unit)? = null,     // null → hide home icon (matches iOS showHome=false)
-    theme: AppTheme,
-    modifier: Modifier = Modifier
+    theme: AppTheme
 ) {
     val ws = rememberWindowSize()
-    Column(modifier = modifier) {
+    Column(modifier = this) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

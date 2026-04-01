@@ -1,12 +1,13 @@
 package com.greengo.app.ui.screens
 
+import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -40,6 +41,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -81,7 +83,7 @@ data class OceanSprite(
 // ─────────────────────────────────────────────────────────────────────────────
 
 class ReefRescuersGame {
-    var score    by mutableStateOf(0)
+    var score    by mutableIntStateOf(0)
     var running  by mutableStateOf(false)
     var gameOver by mutableStateOf(false)
 
@@ -206,6 +208,7 @@ class ReefRescuersGame {
 // MARK: - OceanInfoScreen
 // ─────────────────────────────────────────────────────────────────────────────
 
+@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 fun OceanInfoScreen(vm: AppStateViewModel) {
     val theme by vm.theme.collectAsState()
@@ -301,6 +304,7 @@ fun OceanInfoScreen(vm: AppStateViewModel) {
 //   • navigationBarsPadding on HUD bar so buttons aren't behind Samsung nav bar
 // ─────────────────────────────────────────────────────────────────────────────
 
+@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 fun OceanGameScreen(vm: AppStateViewModel) {
     val game = remember { ReefRescuersGame() }
@@ -327,8 +331,6 @@ fun OceanGameScreen(vm: AppStateViewModel) {
     val hudBg = Color(red = 0.03f, green = 0.10f, blue = 0.28f)
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val totalW = constraints.maxWidth.toFloat()
-        val totalH = constraints.maxHeight.toFloat()
 
         Column(modifier = Modifier.fillMaxSize()) {
 
@@ -456,12 +458,12 @@ fun OceanGameScreen(vm: AppStateViewModel) {
                 }
 
                 // Falling sprites
-                SpriteView(game.tire,            context)
-                SpriteView(game.chipsbag,        context)
+                SpriteView(game.tire, context)
+                SpriteView(game.chipsbag, context)
                 SpriteView(game.greenplasticbag, context)
-                SpriteView(game.oldshoes,        context)
-                SpriteView(game.yellowbottle,    context)
-                SpriteView(game.fish,            context)
+                SpriteView(game.oldshoes, context)
+                SpriteView(game.yellowbottle, context)
+                SpriteView(game.fish, context)
 
                 // Recycling bin
                 BinView(game.recyclingBin, context)
@@ -530,8 +532,9 @@ fun OceanGameScreen(vm: AppStateViewModel) {
 // MARK: - Sprite composables
 // ─────────────────────────────────────────────────────────────────────────────
 
+@SuppressLint("DiscouragedApi")
 @Composable
-private fun BoxScope.SpriteView(s: OceanSprite, context: android.content.Context) {
+private fun SpriteView(s: OceanSprite, context: Context) {
     if (!s.visible) return
     val resId = remember(s.id) {
         context.resources.getIdentifier(s.id, "drawable", context.packageName)
@@ -556,8 +559,9 @@ private fun BoxScope.SpriteView(s: OceanSprite, context: android.content.Context
     }
 }
 
+@SuppressLint("DiscouragedApi")
 @Composable
-private fun BoxScope.BinView(s: OceanSprite, context: android.content.Context) {
+private fun BinView(s: OceanSprite, context: Context) {
     val resId = remember(s.id) {
         context.resources.getIdentifier(s.id, "drawable", context.packageName)
     }

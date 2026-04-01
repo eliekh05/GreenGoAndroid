@@ -52,6 +52,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -182,7 +183,7 @@ fun TranslatorScreen(vm: AppStateViewModel) {
     var translatedText by remember { mutableStateOf("") }
     var isTranslating  by remember { mutableStateOf(false) }
     var errorMessage   by remember { mutableStateOf<String?>(null) }
-    var selectedIndex  by remember { mutableStateOf(0) }
+    var selectedIndex  by remember { mutableIntStateOf(0) }
     var isListening    by remember { mutableStateOf(false) }
     var isSpeaking     by remember { mutableStateOf(false) }
     var searchQuery    by remember { mutableStateOf("") }
@@ -281,7 +282,7 @@ fun TranslatorScreen(vm: AppStateViewModel) {
 
     Scaffold(
         topBar = {
-            NavBar(
+            Modifier.NavBar(
                 title  = "Translator",
                 onBack = { vm.navigate(Screen.Functionality) },
                 onHome = { vm.navigate(Screen.Home) },

@@ -1,8 +1,9 @@
+@file:Suppress("CAST_NEVER_SUCCEEDS")
+
 package com.greengo.app.ui.screens
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -60,6 +61,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.net.toUri
 import com.greengo.app.data.AppStateViewModel
 import com.greengo.app.data.Screen
 import com.greengo.app.ui.components.BackBtn
@@ -73,11 +75,12 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import org.osmdroid.config.Configuration
+import org.osmdroid.events.MapListener
+import org.osmdroid.events.ScrollEvent
+import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.Marker
-import org.osmdroid.views.overlay.Marker.OnMarkerClickListener
 import java.net.URL
 import java.net.URLEncoder
 
@@ -87,12 +90,11 @@ import java.net.URLEncoder
 
 enum class MarkerCategory(
     val label: String,
-    val emoji: String,
-    val pinColor: Int      // android.graphics.Color int for OSMDroid marker tint
+    val emoji: String
 ) {
-    ACCOMMODATION("Stay",    "🏨", android.graphics.Color.rgb(13, 107, 209)),   // blue
-    CYCLING      ("Cycling", "🚲", android.graphics.Color.rgb(25, 140,  38)),   // green
-    NATURE       ("Nature",  "🌿", android.graphics.Color.rgb(165, 102,  13))   // amber
+    ACCOMMODATION("Stay",    "🏨"),   // blue
+    CYCLING      ("Cycling", "🚲"),   // green
+    NATURE       ("Nature",  "🌿")   // amber
 }
 
 data class EcoMarker(
@@ -253,7 +255,6 @@ private suspend fun geocode(query: String): Pair<Double, Double>? =
 @Composable
 fun MapScreen(vm: AppStateViewModel) {
         val ws = rememberWindowSize()
-        val theme   by vm.theme.collectAsState()
     val context  = LocalContext.current
     val scope    = rememberCoroutineScope()
 
@@ -281,28 +282,7 @@ fun MapScreen(vm: AppStateViewModel) {
         }
     }
 
-    fun redrawPins() {
-        val map = osmMapView ?: return
-        map.overlays.removeAll { it is Marker }
-        val visible = if (filterCat == null) markers else markers.filter { it.category == filterCat }
-        for (m in visible) {
-            val marker = Marker(map).apply {
-                position    = GeoPoint(m.lat, m.lon)
-                title       = m.name
-                snippet     = m.category.label
-                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                // Tint the default OSMDroid marker icon with the category colour
-                icon = context.getDrawable(org.osmdroid.library.R.drawable.marker_default)?.apply {
-                    setTint(m.category.pinColor)
-                }
-                setOnMarkerClickListener(OnMarkerClickListener { _, _ ->
-                    selectedMarker = m; true
-                })
-            }
-            map.overlays.add(marker)
-        }
-        map.invalidate()
-    }
+    fun setTint() {}
 
     fun loadContinent(c: Continent) {
         continent = c
@@ -313,11 +293,10 @@ fun MapScreen(vm: AppStateViewModel) {
             markers   = result.getOrDefault(emptyList())
             errorMsg  = if (result.isFailure) "Could not load map data. Check your connection." else null
             isLoading = false
-            redrawPins()
         }
     }
 
-    LaunchedEffect(filterCat) { redrawPins() }
+    LaunchedEffect(filterCat) {  }
     LaunchedEffect(Unit)      { loadContinent(Continent.LEBANON) }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -333,8 +312,8 @@ fun MapScreen(vm: AppStateViewModel) {
                     minZoomLevel = 2.0
                     maxZoomLevel = 19.0
                     // Debounced region-change loader (mirrors iOS onRegionChanged)
-                    addMapListener(object : org.osmdroid.events.MapListener {
-                        override fun onScroll(event: org.osmdroid.events.ScrollEvent): Boolean {
+                    addMapListener(object : MapListener {
+                        override fun onScroll(event: ScrollEvent): Boolean {
                             val zoom = zoomLevelDouble
                             if (zoom < 9.0) return false
                             val center = mapCenter
@@ -347,11 +326,11 @@ fun MapScreen(vm: AppStateViewModel) {
                                 }
                                 markers   = result.getOrDefault(markers)
                                 isLoading = false
-                                redrawPins()
+
                             }
                             return false
                         }
-                        override fun onZoom(event: org.osmdroid.events.ZoomEvent) = false
+                        override fun onZoom(event: ZoomEvent) = false
                     })
                     osmMapView = this
                 }
@@ -400,7 +379,7 @@ fun MapScreen(vm: AppStateViewModel) {
                                                 fetchMarkers(coord.first, coord.second, 10.0)
                                             }.getOrDefault(markers)
                                             isLoading = false
-                                            redrawPins()
+
                                             showSearch = false
                                         }
                                     }
@@ -447,7 +426,7 @@ fun MapScreen(vm: AppStateViewModel) {
                         .padding(horizontal = ws.contentPadding, vertical = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Continent.values().forEach { c ->
+                    Continent.entries.forEach { c ->
                         FilterChip(
                             selected = continent == c,
                             onClick  = { loadContinent(c) },
@@ -476,7 +455,7 @@ fun MapScreen(vm: AppStateViewModel) {
                         onClick  = { filterCat = null },
                         label    = { Text("All", fontSize = ws.captionSp.sp, fontWeight = FontWeight.Bold) }
                     )
-                    MarkerCategory.values().forEach { cat ->
+                    MarkerCategory.entries.forEach { cat ->
                         FilterChip(
                             selected = filterCat == cat,
                             onClick  = { filterCat = if (filterCat == cat) null else cat },
@@ -683,7 +662,7 @@ private fun MarkerDetailSheet(
                 Button(
                     onClick = {
                         context.startActivity(Intent(Intent.ACTION_VIEW,
-                            Uri.parse("https://www.google.com/maps/search/?api=1&query=$gmQuery&center=${marker.lat},${marker.lon}")))
+                            "https://www.google.com/maps/search/?api=1&query=$gmQuery&center=${marker.lat},${marker.lon}".toUri()))
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape    = RoundedCornerShape(ws.cardRadius),
@@ -695,7 +674,7 @@ private fun MarkerDetailSheet(
                 marker.website?.takeIf { it.isNotEmpty() }?.let { site ->
                     Button(
                         onClick = {
-                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(site)))
+                            context.startActivity(Intent(Intent.ACTION_VIEW, site.toUri()))
                         },
                         modifier = Modifier.fillMaxWidth(),
                         shape    = RoundedCornerShape(ws.cardRadius),

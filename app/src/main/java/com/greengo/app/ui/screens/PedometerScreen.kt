@@ -1,6 +1,7 @@
 package com.greengo.app.ui.screens
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -49,6 +50,9 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -81,9 +85,9 @@ class PedometerManager(context: Context) {
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     private val stepSensor    = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
-    var steps      by mutableStateOf(0)
-    var distanceKm by mutableStateOf(0.0)
-    var elapsed    by mutableStateOf(0L)   // milliseconds
+    var steps      by mutableIntStateOf(0)
+    var distanceKm by mutableDoubleStateOf(0.0)
+    var elapsed    by mutableLongStateOf(0L)   // milliseconds
     var isRunning  by mutableStateOf(false)
 
     private var baselineSteps  = -1L
@@ -142,6 +146,7 @@ class PedometerManager(context: Context) {
 // MARK: - PedometerScreen
 // ─────────────────────────────────────────────────────────────────────────────
 
+@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 fun PedometerScreen(vm: AppStateViewModel) {
         val ws = rememberWindowSize()
@@ -181,7 +186,7 @@ fun PedometerScreen(vm: AppStateViewModel) {
 
     Scaffold(
         topBar = {
-            NavBar(
+            Modifier.NavBar(
                 title  = "Pedometer",
                 onBack = { vm.navigate(Screen.Functionality) },
                 onHome = { vm.navigate(Screen.Home) },
@@ -302,9 +307,7 @@ private fun StatCard(value: String, label: String, icon: ImageVector, color: Col
         modifier = Modifier
             .fillMaxWidth()
             .then(
-                Modifier.let {
-                    it  // shadow handled by Surface elevation
-                }
+                Modifier
             ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

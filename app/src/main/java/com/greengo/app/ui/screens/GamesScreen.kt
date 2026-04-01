@@ -1,5 +1,6 @@
 package com.greengo.app.ui.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -64,7 +65,7 @@ fun GamesScreen(vm: AppStateViewModel) {
 
     Scaffold(
         topBar = {
-            NavBar(
+            Modifier.NavBar(
                 title  = "Games",
                 onBack = { vm.navigate(Screen.Home) },
                 onHome = { vm.navigate(Screen.Home) },
@@ -122,6 +123,7 @@ fun GamesScreen(vm: AppStateViewModel) {
     }
 }
 
+@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 private fun GameCard(
     title: String,
@@ -186,6 +188,7 @@ private fun GameCard(
 // MARK: - MemoryInfoScreen
 // ─────────────────────────────────────────────────────────────────────────────
 
+@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 fun MemoryInfoScreen(vm: AppStateViewModel) {
     val ws = rememberWindowSize()

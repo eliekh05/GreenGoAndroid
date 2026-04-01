@@ -1,5 +1,6 @@
 package com.greengo.app.ui.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -32,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -74,14 +76,13 @@ data class MemCard(
 class WildRecallGame {
     companion object {
         val allPairs   = listOf("a1","a2","a3","a4","a5","a6","a7","a8")
-        const val pairsPerGame = 6
     }
 
     var cards      by mutableStateOf<List<MemCard>>(emptyList())
-    var score      by mutableStateOf(0)
-    var matched    by mutableStateOf(0)
+    var score      by mutableIntStateOf(0)
+    var matched    by mutableIntStateOf(0)
     var gameOver   by mutableStateOf(false)
-    var totalPairs by mutableStateOf(pairsPerGame)
+    var totalPairs by mutableIntStateOf(pairspergame)
 
     // Use mutableStateListOf so Compose observes changes — plain mutableListOf causes stale reads
     private val flippedIDs = androidx.compose.runtime.mutableStateListOf<UUID>()
@@ -92,7 +93,7 @@ class WildRecallGame {
     fun deal() {
         score = 0; matched = 0; gameOver = false
         flippedIDs.clear(); busy = false
-        val chosen = allPairs.shuffled().take(pairsPerGame)
+        val chosen = allPairs.shuffled().take(pairspergame)
         totalPairs = chosen.size
         val deck = mutableListOf<MemCard>()
         chosen.forEachIndexed { i, name ->
@@ -225,6 +226,7 @@ fun WildRecallScreen(vm: AppStateViewModel) {
 // MARK: - MemCardView (3-D flip animation)
 // ─────────────────────────────────────────────────────────────────────────────
 
+@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 private fun MemCardView(card: MemCard, theme: AppTheme, onClick: () -> Unit) {
     val ws = rememberWindowSize()
@@ -362,3 +364,5 @@ private fun WildRecallNavBar(theme: AppTheme, onBack: () -> Unit, onHome: () -> 
         HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.6f))
     }
 }
+
+const val pairspergame = 6

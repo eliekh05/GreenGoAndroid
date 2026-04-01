@@ -53,7 +53,7 @@ fun PreferencesScreen(vm: AppStateViewModel) {
 
     Scaffold(
         topBar = {
-            NavBar(
+            Modifier.NavBar(
                 title  = "Preferences",
                 onBack = { vm.navigate(Screen.Home) },
                 onHome = { vm.navigate(Screen.Home) },
@@ -73,7 +73,7 @@ fun PreferencesScreen(vm: AppStateViewModel) {
         ) {
             // Appearance
             PrefSection(title = "Appearance") {
-                AppTheme.values().forEach { t ->
+                AppTheme.entries.forEach { t ->
                     Surface(
                         onClick = { vm.setTheme(t) },
                         color   = theme.cardBackground,
@@ -146,16 +146,16 @@ fun PreferencesScreen(vm: AppStateViewModel) {
 
     if (showResetConfirm) {
         AlertDialog(
-            onDismissRequest = { showResetConfirm = false },
+            onDismissRequest = { },
             title = { Text("Reset all app data?") },
             text  = { Text("This resets high scores and restores the default theme.") },
             confirmButton = {
-                TextButton(onClick = { vm.resetAllAppData(); showResetConfirm = false }) {
+                TextButton(onClick = { vm.resetAllAppData(); }) {
                     Text("Reset", color = Color.Red)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showResetConfirm = false }) { Text("Cancel") }
+                TextButton(onClick = { }) { Text("Cancel") }
             }
         )
     }
@@ -176,7 +176,7 @@ fun SettingsScreen(vm: AppStateViewModel) {
 
     Scaffold(
         topBar = {
-            NavBar(
+            Modifier.NavBar(
                 title  = "Settings",
                 onBack = { vm.navigate(Screen.Home) },
                 onHome = { vm.navigate(Screen.Home) },
@@ -196,7 +196,7 @@ fun SettingsScreen(vm: AppStateViewModel) {
         ) {
             // Appearance
             PrefSection(title = "Appearance") {
-                AppTheme.values().forEach { t ->
+                AppTheme.entries.forEach { t ->
                     Surface(
                         onClick = { vm.setTheme(t) },
                         color   = theme.cardBackground,
@@ -246,16 +246,16 @@ fun SettingsScreen(vm: AppStateViewModel) {
 
     if (showResetConfirm) {
         AlertDialog(
-            onDismissRequest = { showResetConfirm = false },
+            onDismissRequest = { },
             title = { Text("Reset all app data?") },
             text  = { Text("This resets high scores, shows all info screens again, and restores the default theme.") },
             confirmButton = {
-                TextButton(onClick = { vm.resetAllAppData(); showResetConfirm = false }) {
+                TextButton(onClick = { vm.resetAllAppData(); }) {
                     Text("Reset", color = Color.Red)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showResetConfirm = false }) { Text("Cancel") }
+                TextButton(onClick = { }) { Text("Cancel") }
             }
         )
     }

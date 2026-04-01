@@ -1,5 +1,6 @@
 package com.greengo.app.ui.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,7 +50,7 @@ fun FunctionalityScreen(vm: AppStateViewModel) {
 
     Scaffold(
         topBar = {
-            NavBar(
+            Modifier.NavBar(
                 title = "Functionality",
                 onBack = { vm.navigate(Screen.Home) },
                 onHome = { vm.navigate(Screen.Home) },
@@ -87,6 +88,7 @@ fun FunctionalityScreen(vm: AppStateViewModel) {
     }
 }
 
+@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 private fun ToolCard(
     title: String,

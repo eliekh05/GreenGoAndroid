@@ -2,10 +2,13 @@ package com.greengo.app.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import androidx.core.content.edit
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MARK: - AppStateViewModel
@@ -40,6 +43,7 @@ class AppStateViewModel : ViewModel() {
         _screen.value = screen
     }
 
+    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     fun navigateBack() {
         if (backStack.isNotEmpty()) {
             _screen.value = backStack.removeLast()
@@ -53,7 +57,7 @@ class AppStateViewModel : ViewModel() {
 
     fun setTheme(t: AppTheme) {
         _theme.value = t
-        prefs.edit().putString("appTheme", t.rawValue).apply()
+        prefs.edit { putString("appTheme", t.rawValue) }
     }
 
     // ── High Scores ───────────────────────────────────────────────────────────
@@ -70,28 +74,28 @@ class AppStateViewModel : ViewModel() {
     fun saveTriviaScore(v: Int) {
         val best = maxOf(_triviaScore.value, v)
         _triviaScore.value = best
-        prefs.edit().putInt("score_trivia", best).apply()
+        prefs.edit { putInt("score_trivia", best) }
     }
 
     fun saveMemoryScore(v: Int) {
         val best = maxOf(_memoryScore.value, v)
         _memoryScore.value = best
-        prefs.edit().putInt("score_memory", best).apply()
+        prefs.edit { putInt("score_memory", best) }
     }
 
     fun saveOceanScore(v: Int) {
         val best = maxOf(_oceanScore.value, v)
         _oceanScore.value = best
-        prefs.edit().putInt("score_ocean", best).apply()
+        prefs.edit { putInt("score_ocean", best) }
     }
 
     fun resetAllScores() {
         _triviaScore.value = 0; _memoryScore.value = 0; _oceanScore.value = 0
-        prefs.edit()
-            .putInt("score_trivia", 0)
-            .putInt("score_memory", 0)
-            .putInt("score_ocean", 0)
-            .apply()
+        prefs.edit {
+            putInt("score_trivia", 0)
+                .putInt("score_memory", 0)
+                .putInt("score_ocean", 0)
+        }
     }
 
     // ── "Don't show again" flags ──────────────────────────────────────────────
@@ -107,17 +111,17 @@ class AppStateViewModel : ViewModel() {
 
     fun setSkipMapInfo(v: Boolean) {
         _skipMapInfo.value = v
-        prefs.edit().putBoolean("skip_mapInfo", v).apply()
+        prefs.edit { putBoolean("skip_mapInfo", v) }
     }
 
     fun setSkipOceanInfo(v: Boolean) {
         _skipOceanInfo.value = v
-        prefs.edit().putBoolean("skip_oceanInfo", v).apply()
+        prefs.edit { putBoolean("skip_oceanInfo", v) }
     }
 
     fun setSkipMemoryInfo(v: Boolean) {
         _skipMemoryInfo.value = v
-        prefs.edit().putBoolean("skip_memoryInfo", v).apply()
+        prefs.edit { putBoolean("skip_memoryInfo", v) }
     }
 
     fun resetPreferences() {

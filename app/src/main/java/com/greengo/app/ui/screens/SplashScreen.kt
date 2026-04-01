@@ -1,6 +1,6 @@
 package com.greengo.app.ui.screens
 
-import android.net.Uri
+import android.annotation.SuppressLint
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.ViewGroup
@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.net.toUri
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -44,6 +45,7 @@ import kotlinx.coroutines.delay
 // Result: identical to iOS — pure fullscreen video, nothing else on screen.
 // ─────────────────────────────────────────────────────────────────────────────
 
+@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 fun SplashScreen(vm: AppStateViewModel) {
     val context  = LocalContext.current
@@ -68,7 +70,7 @@ fun SplashScreen(vm: AppStateViewModel) {
         ExoPlayer.Builder(context)
             .build()
             .apply {
-                val uri = Uri.parse("android.resource://${context.packageName}/$rawResId")
+                val uri = "android.resource://${context.packageName}/$rawResId".toUri()
                 setMediaItem(MediaItem.fromUri(uri))
 
                 // Audio focus: play audio like iOS AVPlayer default (respects ringer)
@@ -77,7 +79,7 @@ fun SplashScreen(vm: AppStateViewModel) {
                         .setUsage(C.USAGE_MEDIA)
                         .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
                         .build(),
-                    /* handleAudioFocus= */ true
+                    /* p1 = */ true
                 )
 
                 repeatMode    = Player.REPEAT_MODE_OFF

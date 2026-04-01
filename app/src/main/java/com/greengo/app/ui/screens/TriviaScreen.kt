@@ -1,5 +1,6 @@
 package com.greengo.app.ui.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -65,8 +67,8 @@ fun TriviaScreen(vm: AppStateViewModel) {
     // Game state — rebuilt on each new game (matching iOS buildGame())
     var questions    by remember { mutableStateOf<List<TriviaQuestion>>(emptyList()) }
     var answerOrders by remember { mutableStateOf<List<List<Int>>>(emptyList()) }
-    var qIndex       by remember { mutableStateOf(0) }
-    var score        by remember { mutableStateOf(0) }
+    var qIndex       by remember { mutableIntStateOf(0) }
+    var score        by remember { mutableIntStateOf(0) }
     var chosen       by remember { mutableStateOf<Int?>(null) }
     var showFeedback by remember { mutableStateOf(false) }
 
@@ -199,6 +201,7 @@ fun TriviaScreen(vm: AppStateViewModel) {
 // MARK: - AnswerCard
 // ─────────────────────────────────────────────────────────────────────────────
 
+@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 private fun AnswerCard(
     ans: TriviaAnswer,
@@ -333,6 +336,7 @@ private fun TriviaNavBar(
 // MARK: - TriviaScoreScreen
 // ─────────────────────────────────────────────────────────────────────────────
 
+@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 fun TriviaScoreScreen(vm: AppStateViewModel, score: Int) {
     val ws = rememberWindowSize()

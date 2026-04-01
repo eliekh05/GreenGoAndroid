@@ -1,5 +1,6 @@
 package com.greengo.app.ui.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -142,12 +143,13 @@ fun HomeScreen(vm: AppStateViewModel) {
             }
         }
 
-        HomeHeader(theme, ws)
+        HomeHeader(ws)
     }
 }
 
+@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
-private fun HomeHeader(theme: AppTheme, ws: WindowSize) {
+private fun HomeHeader(ws: WindowSize) {
         val context    = LocalContext.current
     val logoResId  = remember {
         context.resources.getIdentifier("greengologocopy", "drawable", context.packageName)
@@ -183,6 +185,7 @@ private fun HomeHeader(theme: AppTheme, ws: WindowSize) {
     }
 }
 
+@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 private fun TileCard(tile: NavTile, theme: AppTheme, ws: WindowSize, onClick: () -> Unit) {
         val context     = LocalContext.current

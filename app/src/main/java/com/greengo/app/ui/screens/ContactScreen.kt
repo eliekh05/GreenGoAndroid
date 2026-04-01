@@ -1,7 +1,7 @@
 package com.greengo.app.ui.screens
 
+import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -47,6 +47,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import com.greengo.app.data.AppStateViewModel
 import com.greengo.app.data.Screen
 import com.greengo.app.ui.components.NavBar
@@ -93,7 +94,7 @@ private suspend fun supabaseSend(replyTo: String, subject: String, message: Stri
         }
     }
 
-private val emailRegex = Regex("^[A-Z0-9a-z._%+\\-]+@[A-Za-z0-9.\\-]+\\.[A-Za-z]{2,}\$")
+private val emailRegex = Regex("^[A-Z0-9a-z._%+\\-]+@[A-Za-z0-9.\\-]+\\.[A-Za-z]{2,}$")
 private fun sanitize(raw: String): String {
     val htmlStripped = raw.replace(Regex("<[^>]*>"), "")
     return htmlStripped.replace(
@@ -106,6 +107,7 @@ private fun sanitize(raw: String): String {
 // MARK: - ContactScreen
 // ─────────────────────────────────────────────────────────────────────────────
 
+@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 fun ContactScreen(vm: AppStateViewModel) {
     val ws = rememberWindowSize()
@@ -133,7 +135,7 @@ fun ContactScreen(vm: AppStateViewModel) {
 
     Scaffold(
         topBar = {
-            NavBar(
+            Modifier.NavBar(
                 title = "Contact Us",
                 onBack = { vm.navigate(Screen.Home) },
                 onHome = { vm.navigate(Screen.Home) },
@@ -250,7 +252,7 @@ fun ContactScreen(vm: AppStateViewModel) {
                 Text("You can also reach us at:", fontSize = ws.captionSp.sp, color = theme.text.copy(alpha = 0.65f))
                 TextButton(
                     onClick = {
-                        val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:$toAddress"))
+                        val intent = Intent(Intent.ACTION_SENDTO, "mailto:$toAddress".toUri())
                         context.startActivity(intent)
                     },
                     contentPadding = PaddingValues(0.dp)
@@ -263,12 +265,11 @@ fun ContactScreen(vm: AppStateViewModel) {
 
     if (showAlert) {
         AlertDialog(
-            onDismissRequest = { showAlert = false },
+            onDismissRequest = { },
             title = { Text("Message") },
             text  = { Text(alertMsg) },
             confirmButton = {
                 TextButton(onClick = {
-                    showAlert = false
                     if (alertSuccess) vm.navigate(Screen.Home)
                 }) { Text("OK") }
             }
@@ -281,7 +282,7 @@ private fun ContactField(
     placeholder: String,
     value: String,
     onValueChange: (String) -> Unit,
-    keyboardType: androidx.compose.ui.text.input.KeyboardType = androidx.compose.ui.text.input.KeyboardType.Text,
+    keyboardType: KeyboardType = KeyboardType.Text,
     theme: com.greengo.app.data.AppTheme
 ) {
     val ws = rememberWindowSize()

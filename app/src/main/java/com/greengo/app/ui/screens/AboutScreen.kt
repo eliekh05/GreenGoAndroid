@@ -1,5 +1,6 @@
 package com.greengo.app.ui.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +38,7 @@ import com.greengo.app.ui.components.GreenPrimary
 import com.greengo.app.ui.components.NavBar
 import com.greengo.app.ui.components.rememberWindowSize
 
+@SuppressLint("DiscouragedApi", "LocalContextResourcesRead")
 @Composable
 fun AboutScreen(vm: AppStateViewModel) {
     val ws = rememberWindowSize()
@@ -74,7 +76,7 @@ fun AboutScreen(vm: AppStateViewModel) {
 
     Scaffold(
         topBar = {
-            NavBar(
+            Modifier.NavBar(
                 title = "About",
                 onBack = { vm.navigate(Screen.Home) },
                 onHome = { vm.navigate(Screen.Home) },

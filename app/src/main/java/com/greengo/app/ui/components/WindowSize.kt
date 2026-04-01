@@ -1,5 +1,6 @@
 package com.greengo.app.ui.components
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
@@ -25,24 +26,21 @@ import kotlin.math.roundToInt
 //   ≥ 840 dp  → EXPANDED  tablets, Chromebooks, large foldables open
 //
 // Every dp value below is computed from a single linear scale anchored at
-// 412 dp (the most common flagship width — Pixel 6-10, S24+, S25 Ultra etc).
+// 412 dp (the most common flagship width — Pixel 6-10, S24+, S25 Ultra etc.).
 // Nothing is looked up. Everything just scales.
 // ─────────────────────────────────────────────────────────────────────────────
 
 enum class WindowWidthClass  { COMPACT, MEDIUM, EXPANDED }
-enum class WindowHeightClass { COMPACT, MEDIUM, EXPANDED }
 
 @Stable
 class WindowSize(
     val widthClass:  WindowWidthClass,
-    val heightClass: WindowHeightClass,
     val widthDp:     Dp,
     val heightDp:    Dp
 ) {
     // ── Form factor ───────────────────────────────────────────────────────────
 
     val isPhone:         Boolean get() = widthClass == WindowWidthClass.COMPACT
-    val isMedium:        Boolean get() = widthClass == WindowWidthClass.MEDIUM
     val isTablet:        Boolean get() = widthClass == WindowWidthClass.EXPANDED
     val aspectRatio:     Float   get() = heightDp.value / widthDp.value
 
@@ -105,12 +103,9 @@ class WindowSize(
     // Memory cards — targets ~85 dp per card
     val memoryCardColumns: Int get() = (widthDp.value / 85f).toInt().coerceIn(3, 8)
 
-    // General grid (game cards, trivia) — targets ~180 dp per column
-    val gridColumns: Int get() = (widthDp.value / 180f).toInt().coerceIn(1, 6)
-
-    val useTwoColumnLayout: Boolean get() = !isPhone
 }
 
+@SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 fun rememberWindowSize(): WindowSize {
     val config = LocalConfiguration.current
@@ -120,11 +115,6 @@ fun rememberWindowSize(): WindowSize {
                 config.screenWidthDp < 600  -> WindowWidthClass.COMPACT
                 config.screenWidthDp < 840  -> WindowWidthClass.MEDIUM
                 else                        -> WindowWidthClass.EXPANDED
-            },
-            heightClass = when {
-                config.screenHeightDp < 480 -> WindowHeightClass.COMPACT
-                config.screenHeightDp < 900 -> WindowHeightClass.MEDIUM
-                else                        -> WindowHeightClass.EXPANDED
             },
             widthDp  = config.screenWidthDp.dp,
             heightDp = config.screenHeightDp.dp
