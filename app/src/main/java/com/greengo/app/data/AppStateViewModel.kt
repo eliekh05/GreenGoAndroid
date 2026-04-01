@@ -2,19 +2,11 @@ package com.greengo.app.data
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.core.content.edit
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MARK: - AppStateViewModel
-// Mirrors iOS AppState: navigation, scores, theme, skip-info flags.
-// All state is backed by SharedPreferences (equivalent to UserDefaults).
-// ─────────────────────────────────────────────────────────────────────────────
 
 class AppStateViewModel : ViewModel() {
 
@@ -27,7 +19,7 @@ class AppStateViewModel : ViewModel() {
         _memoryScore.value  = prefs.getInt("score_memory", 0)
         _oceanScore.value   = prefs.getInt("score_ocean", 0)
         _skipMapInfo.value  = prefs.getBoolean("skip_mapInfo", false)
-        _skipOceanInfo.value  = prefs.getBoolean("skip_oceanInfo", false)
+        _skipOceanInfo.value = prefs.getBoolean("skip_oceanInfo", false)
         _skipMemoryInfo.value = prefs.getBoolean("skip_memoryInfo", false)
     }
 
@@ -43,11 +35,14 @@ class AppStateViewModel : ViewModel() {
         _screen.value = screen
     }
 
-    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     fun navigateBack() {
         if (backStack.isNotEmpty()) {
             _screen.value = backStack.removeLast()
         }
+    }
+
+    fun canNavigateBack(): Boolean {
+        return backStack.isNotEmpty()
     }
 
     // ── Theme ─────────────────────────────────────────────────────────────────
@@ -93,8 +88,8 @@ class AppStateViewModel : ViewModel() {
         _triviaScore.value = 0; _memoryScore.value = 0; _oceanScore.value = 0
         prefs.edit {
             putInt("score_trivia", 0)
-                .putInt("score_memory", 0)
-                .putInt("score_ocean", 0)
+            putInt("score_memory", 0)
+            putInt("score_ocean", 0)
         }
     }
 
