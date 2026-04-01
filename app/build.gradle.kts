@@ -1,7 +1,6 @@
+// AGP 9.0+ provides built-in Kotlin — no need for kotlin-android plugin.
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -9,11 +8,11 @@ android {
     compileSdk  = 36
 
     defaultConfig {
-        applicationId          = "com.greengo.app"
-        minSdk                 = 26
-        targetSdk              = 36
-        versionCode            = 1
-        versionName            = "1.0"
+        applicationId             = "com.greengo.app"
+        minSdk                    = 26
+        targetSdk                 = 36
+        versionCode               = 1
+        versionName               = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -36,10 +35,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    kotlin {
-        jvmToolchain(11)
-    }
-
     buildFeatures {
         compose = true
     }
@@ -60,7 +55,7 @@ dependencies {
     implementation(libs.androidx.runtime)
     implementation(libs.material.icons.extended)
 
-    // Networking (Translator + Contact screens)
+    // Networking (TranslatorScreen + ContactScreen)
     implementation(libs.okhttp)
 
     // Map (MapScreen)

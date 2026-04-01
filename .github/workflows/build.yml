@@ -24,8 +24,6 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5.0.2
-        with:
-          gradle-version: '9.4.1'
 
       - name: Validation
         uses: gradle/actions/wrapper-validation@v5

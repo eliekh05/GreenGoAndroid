@@ -1,6 +1,5 @@
-// Top-level build file — configuration shared across all subprojects/modules.
+// Top-level build file — AGP 9.0+ has built-in Kotlin support.
+// No need to declare kotlin.android or kotlin.compose here.
 plugins {
     alias(libs.plugins.android.application) apply false
-    alias(libs.plugins.kotlin.android)      apply false
-    alias(libs.plugins.kotlin.compose)      apply false
 }
