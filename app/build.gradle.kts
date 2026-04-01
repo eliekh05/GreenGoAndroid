@@ -5,44 +5,52 @@ plugins {
 }
 
 android {
-    namespace = "com.greengo.app"
-    compileSdk = 36
+    namespace   = "com.greengo.app"
+    compileSdk  = 35
 
     defaultConfig {
-        applicationId = "com.greengo.app"
-        minSdk = 26
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
-
+        applicationId          = "com.greengo.app"
+        minSdk                 = 26
+        targetSdk              = 35
+        versionCode            = 1
+        versionName            = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled   = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
+        debug {
+            applicationIdSuffix = ".debug"
+        }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlin {
         jvmToolchain(11)
     }
+
     buildFeatures {
         compose = true
     }
 }
 
 dependencies {
+    // Activity
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.activity.compose)
 
+    // Compose BOM — pins all Compose versions together
     val bom = platform(libs.androidx.compose.bom)
     implementation(bom)
     implementation(libs.androidx.ui)
@@ -50,7 +58,19 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.runtime)
+    implementation(libs.material.icons.extended)
 
+    // Networking (Translator + Contact screens)
+    implementation(libs.okhttp)
+
+    // Map (MapScreen)
+    implementation(libs.osmdroid.android)
+
+    // Video player (SplashScreen)
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.ui)
+
+    // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
