@@ -40,7 +40,7 @@ data class OceanSprite(
     val id: String,
     val x: Float = 0f,
     val y: Float = 0f,
-    val size: Float = 60f,        // increased from 50 to 60 — more visible on phone
+    val size: Float = 80f,        // 80dp — matches iOS .frame(width:80,height:80)
     val visible: Boolean = true
 )
 
@@ -69,7 +69,7 @@ class ReefRescuersGame {
     var canvasHeight: Float = 700f
 
     private val platformH = 20f
-    private val binSize   = 70f    // bigger bin — easier to use on phone
+    private val binSize   = 110f   // matches iOS 110pt bin width
 
     private val platformY get() = canvasHeight - platformH
     private val binY      get() = platformY - binSize
@@ -389,15 +389,23 @@ fun OceanGameScreen(vm: AppStateViewModel) {
                     modifier = Modifier
                         .fillMaxSize()
                         .pointerInput(Unit) {
-                            detectDragGestures(
-                                onDragStart = { offset -> game.dragBin(offset.x) },
-                                onDrag = { _, _ -> },
-                                onDragEnd = {},
-                                onDragCancel = {}
-                            )
-                        }
-                        .pointerInput(Unit) {
-                            detectTapGestures { offset -> game.dragBin(offset.x) }
+                            // Track absolute finger position across whole screen
+                            awaitEachGesture {
+                                val down = awaitFirstDown(requireUnconsumed = false)
+                                game.dragBin(down.position.x)
+                                var currentX = down.position.x
+                                var pointerDown = true
+                                while (pointerDown) {
+                                    val event = awaitPointerEvent()
+                                    val drag = event.changes.firstOrNull()
+                                    if (drag != null) {
+                                        currentX = drag.position.x
+                                        game.dragBin(currentX)
+                                        drag.consume()
+                                    }
+                                    pointerDown = event.changes.any { it.pressed }
+                                }
+                            }
                         }
                 )
 
