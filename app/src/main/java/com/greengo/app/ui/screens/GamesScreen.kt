@@ -58,7 +58,7 @@ fun GamesScreen(vm: AppStateViewModel) {
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = ws.contentPadding)

@@ -618,7 +618,7 @@ private fun MarkerDetailSheet(
 
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
                     .padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(ws.cardSpacing)

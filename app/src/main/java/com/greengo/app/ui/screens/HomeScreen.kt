@@ -58,7 +58,7 @@ fun HomeScreen(vm: AppStateViewModel) {
     Box(modifier = Modifier.fillMaxSize().background(theme.background)) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
         ) {
             // Space for pinned header

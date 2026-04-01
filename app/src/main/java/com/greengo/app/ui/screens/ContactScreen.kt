@@ -126,7 +126,7 @@ fun ContactScreen(vm: AppStateViewModel) {
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
                 .padding(ws.cardInnerPadding),
