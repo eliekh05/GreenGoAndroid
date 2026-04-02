@@ -1,5 +1,6 @@
 package com.greengo.app.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
@@ -30,16 +31,18 @@ import com.greengo.app.ui.screens.TriviaScoreScreen
 import com.greengo.app.ui.screens.TriviaScreen
 import com.greengo.app.ui.screens.WildRecallScreen
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MARK: - ContentView
-// Root composable: reads screen from ViewModel, renders matching screen.
-// AnimatedContent provides the .easeInOut(duration: 0.22) crossfade equivalent.
-// ─────────────────────────────────────────────────────────────────────────────
-
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ContentView(vm: AppStateViewModel) {
     val screen by vm.screen.collectAsState()
+
+    // Global back handler:
+    // - On Splash: do nothing (can't go back, splash is one-way)
+    // - On Home with empty stack: do nothing (let Android handle — exits app)
+    // - Everywhere else: pop the back stack
+    BackHandler(enabled = screen !is Screen.Splash && !vm.isAtRoot()) {
+        vm.navigateBack()
+    }
 
     AnimatedContent(
         targetState = screen,

@@ -2,8 +2,8 @@ package com.greengo.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -15,6 +15,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.greengo.app.data.AppStateViewModel
 import com.greengo.app.data.AppTheme
+import com.greengo.app.data.Screen
 import com.greengo.app.ui.ContentView
 
 class MainActivity : ComponentActivity() {
@@ -24,27 +25,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Let Compose draw under system bars (edge‑to‑edge)
+        // Edge-to-edge: Compose draws under system bars
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        hideSystemBars()
 
-        // Hide both status and nav bars (immersive experience)
-        val insetsController = WindowInsetsControllerCompat(window, window.decorView)
-        insetsController.hide(WindowInsetsCompat.Type.systemBars())
-        insetsController.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-
-        // Back button logic: internal navigation or exit
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (vm.canNavigateBack()) {
-                    vm.navigateBack()
-                } else {
-                    finishAffinity()  // exit app
-                }
-            }
-        })
-
-        // Init your ViewModel state
         vm.init(applicationContext)
 
         setContent {
@@ -57,4 +41,22 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        // Re-apply immersive mode whenever the window regains focus
+        // (system can restore bars after dialogs, notifications, etc.)
+        if (hasFocus) hideSystemBars()
+    }
+
+    private fun hideSystemBars() {
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            hide(WindowInsetsCompat.Type.systemBars())
+            systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+    }
+
+    // Back press is handled entirely by the ViewModel — no override needed here.
+    // ContentView / each screen handles BackHandler composable where appropriate.
 }

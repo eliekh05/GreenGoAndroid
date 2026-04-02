@@ -14,16 +14,20 @@ class AppStateViewModel : ViewModel() {
 
     fun init(context: Context) {
         prefs = context.getSharedPreferences("greengo_prefs", Context.MODE_PRIVATE)
-        _theme.value        = AppTheme.fromRawValue(prefs.getString("appTheme", "mint") ?: "mint")
-        _triviaScore.value  = prefs.getInt("score_trivia", 0)
-        _memoryScore.value  = prefs.getInt("score_memory", 0)
-        _oceanScore.value   = prefs.getInt("score_ocean", 0)
-        _skipMapInfo.value  = prefs.getBoolean("skip_mapInfo", false)
+        _theme.value         = AppTheme.fromRawValue(prefs.getString("appTheme", "mint") ?: "mint")
+        _triviaScore.value   = prefs.getInt("score_trivia", 0)
+        _memoryScore.value   = prefs.getInt("score_memory", 0)
+        _oceanScore.value    = prefs.getInt("score_ocean", 0)
+        _skipMapInfo.value   = prefs.getBoolean("skip_mapInfo", false)
         _skipOceanInfo.value = prefs.getBoolean("skip_oceanInfo", false)
-        _skipMemoryInfo.value = prefs.getBoolean("skip_memoryInfo", false)
+        _skipMemoryInfo.value= prefs.getBoolean("skip_memoryInfo", false)
     }
 
     // ── Navigation ────────────────────────────────────────────────────────────
+    // Rules:
+    //   • Splash is NEVER added to the back stack — it's a one-way gate.
+    //   • Home is the root. Back from Home exits the app.
+    //   • All other screens push to the stack normally.
 
     private val _screen = MutableStateFlow<Screen>(Screen.Splash)
     val screen: StateFlow<Screen> = _screen.asStateFlow()
@@ -31,7 +35,11 @@ class AppStateViewModel : ViewModel() {
     private val backStack = mutableListOf<Screen>()
 
     fun navigate(screen: Screen) {
-        backStack.add(_screen.value)
+        val current = _screen.value
+        // Never push Splash onto the back stack
+        if (current !is Screen.Splash) {
+            backStack.add(current)
+        }
         _screen.value = screen
     }
 
@@ -39,11 +47,13 @@ class AppStateViewModel : ViewModel() {
         if (backStack.isNotEmpty()) {
             _screen.value = backStack.removeLast()
         }
+        // If stack is empty we're at Home — caller handles app exit
     }
 
-    fun canNavigateBack(): Boolean {
-        return backStack.isNotEmpty()
-    }
+    fun canNavigateBack(): Boolean = backStack.isNotEmpty()
+
+    // Home is the root — back from Home should exit the app
+    fun isAtRoot(): Boolean = _screen.value is Screen.Home && backStack.isEmpty()
 
     // ── Theme ─────────────────────────────────────────────────────────────────
 
@@ -104,20 +114,9 @@ class AppStateViewModel : ViewModel() {
     private val _skipMemoryInfo = MutableStateFlow(false)
     val skipMemoryInfo: StateFlow<Boolean> = _skipMemoryInfo.asStateFlow()
 
-    fun setSkipMapInfo(v: Boolean) {
-        _skipMapInfo.value = v
-        prefs.edit { putBoolean("skip_mapInfo", v) }
-    }
-
-    fun setSkipOceanInfo(v: Boolean) {
-        _skipOceanInfo.value = v
-        prefs.edit { putBoolean("skip_oceanInfo", v) }
-    }
-
-    fun setSkipMemoryInfo(v: Boolean) {
-        _skipMemoryInfo.value = v
-        prefs.edit { putBoolean("skip_memoryInfo", v) }
-    }
+    fun setSkipMapInfo(v: Boolean)    { _skipMapInfo.value = v;    prefs.edit { putBoolean("skip_mapInfo", v) } }
+    fun setSkipOceanInfo(v: Boolean)  { _skipOceanInfo.value = v;  prefs.edit { putBoolean("skip_oceanInfo", v) } }
+    fun setSkipMemoryInfo(v: Boolean) { _skipMemoryInfo.value = v; prefs.edit { putBoolean("skip_memoryInfo", v) } }
 
     fun resetPreferences() {
         setSkipMapInfo(false); setSkipOceanInfo(false); setSkipMemoryInfo(false)
