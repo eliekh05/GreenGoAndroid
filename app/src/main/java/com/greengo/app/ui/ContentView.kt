@@ -37,9 +37,12 @@ fun ContentView(vm: AppStateViewModel) {
     val screen by vm.screen.collectAsState()
 
     // Global back handler:
-    // - On Splash: do nothing (can't go back, splash is one-way)
-    // - On Home with empty stack: do nothing (let Android handle — exits app)
+    // - On Splash: consume the event, do nothing (splash is a one-way gate, don't exit)
+    // - On Home with empty stack: disabled → Android default fires → app exits (correct)
     // - Everywhere else: pop the back stack
+    BackHandler(enabled = screen is Screen.Splash) {
+        // Intentionally empty — block back press during splash
+    }
     BackHandler(enabled = screen !is Screen.Splash && !vm.isAtRoot()) {
         vm.navigateBack()
     }
