@@ -52,47 +52,10 @@ import com.greengo.app.data.AppStateViewModel
 import com.greengo.app.data.Screen
 import com.greengo.app.ui.components.NavBar
 import com.greengo.app.ui.components.rememberWindowSize
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONObject
-import java.util.concurrent.TimeUnit
 
-private val supabaseClient = OkHttpClient.Builder()
-    .connectTimeout(15, TimeUnit.SECONDS)
-    .readTimeout(15, TimeUnit.SECONDS)
-    .build()
 
-private suspend fun supabaseSend(replyTo: String, subject: String, message: String): String? =
-    withContext(Dispatchers.IO) {
-        try {
-            val payload = JSONObject().apply {
-                put("replyTo", replyTo)
-                put("subject", subject)
-                put("message", message)
-            }
-            val body = payload.toString()
-                .toRequestBody("application/json".toMediaType())
-            val request = Request.Builder()
-                .url("https://sjsjagoqzjvgsiyejial.supabase.co/functions/v1/send-email")
-                .post(body)
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Authorization", "sb_publishable_fbfUw36cqPdExnkaHxxtBw_Kfx9Sj5L")
-                .build()
-            supabaseClient.newCall(request).execute().use { response ->
-                if (response.code == 200) return@withContext null
-                val json = runCatching { JSONObject(response.body?.string() ?: "") }.getOrNull()
-                json?.optString("error")?.takeIf { it.isNotEmpty() }
-                    ?: "Server error (${response.code})"
-            }
-        } catch (e: Exception) {
-            e.localizedMessage ?: "Unknown network error"
-        }
-    }
+
 
 private val emailRegex = Regex("^[A-Z0-9a-z._%+\\-]+@[A-Za-z0-9.\\-]+\\.[A-Za-z]{2,}$")
 private fun sanitize(raw: String): String {
@@ -211,7 +174,7 @@ fun ContactScreen(vm: AppStateViewModel) {
                     val msg     = sanitize(messageText)
                     isSending = true
                     scope.launch {
-                        val err = supabaseSend(from, subject, msg)
+                        val err = err 
                         isSending = false
                         if (err != null) {
                             alertMsg = "Could not send your message ($err). Please try again or email $toAddress directly."
