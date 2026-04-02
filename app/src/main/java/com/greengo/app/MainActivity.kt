@@ -15,18 +15,31 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.greengo.app.data.AppStateViewModel
 import com.greengo.app.data.AppTheme
-import com.greengo.app.data.Screen
 import com.greengo.app.ui.ContentView
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Immersive mode for the whole app — exactly like YouTube / Netflix / games:
+//
+//   • Status bar + navigation bar are hidden at all times.
+//   • Swipe from edge → bars appear briefly (transient overlay), then auto-hide.
+//   • No toggle button. No per-screen logic. One place, whole app.
+//   • onWindowFocusChanged re-applies it after dialogs / notifications restore bars.
+// ─────────────────────────────────────────────────────────────────────────────
 
 class MainActivity : ComponentActivity() {
 
     private val vm: AppStateViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // enableEdgeToEdge() must be before setContent — makes system bars transparent
+        // and tells the system we'll handle insets ourselves (SDK 35+ enforces this)
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        // Edge-to-edge: Compose draws under system bars
+        // Draw our content behind system bars (full screen canvas)
         WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        // Hide bars for the whole app
         hideSystemBars()
 
         vm.init(applicationContext)
@@ -44,19 +57,20 @@ class MainActivity : ComponentActivity() {
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        // Re-apply immersive mode whenever the window regains focus
-        // (system can restore bars after dialogs, notifications, etc.)
+        // System can restore bars after notifications, dialogs, or app switcher.
+        // Re-hide whenever we get focus back — same as how games handle this.
         if (hasFocus) hideSystemBars()
     }
 
     private fun hideSystemBars() {
         WindowInsetsControllerCompat(window, window.decorView).apply {
+            // Hide both status bar and navigation bar
             hide(WindowInsetsCompat.Type.systemBars())
+            // BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE:
+            // Swipe from edge → bars appear as a transparent overlay briefly → auto-hide.
+            // This is exactly what YouTube, Netflix, and games use.
             systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
     }
-
-    // Back press is handled entirely by the ViewModel — no override needed here.
-    // ContentView / each screen handles BackHandler composable where appropriate.
 }
