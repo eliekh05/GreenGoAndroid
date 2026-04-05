@@ -1,93 +1,55 @@
 package com.greengo.app.ui.screens
 
-import android.annotation.SuppressLint
-import android.content.Context
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.*
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
+import androidx.compose.ui.draw.*
+import androidx.compose.ui.geometry.*
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.layout.*
+import androidx.compose.ui.platform.*
+import androidx.compose.ui.res.*
+import androidx.compose.ui.text.font.*
+import androidx.compose.ui.text.style.*
+import androidx.compose.ui.unit.*
+import androidx.compose.ui.viewinterop.*
+import androidx.compose.foundation.shape.*
+import androidx.compose.material.icons.automirrored.filled.*
 import com.greengo.app.data.AppStateViewModel
 import com.greengo.app.data.Screen
 import com.greengo.app.ui.components.BackBtn
+import com.greengo.app.ui.components.rememberWindowSize
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.isActive
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MARK: - Sprite model  (mirrors iOS OceanSprite)
+// Sprite model — ALL coordinates and sizes are in PIXELS
+// density is injected once in initCanvas so game logic stays unit-agnostic
 // ─────────────────────────────────────────────────────────────────────────────
 
 data class OceanSprite(
     val id: String,
     val x: Float = 0f,
     val y: Float = 0f,
-    val size: Float = 80f,        // 80dp — matches iOS .frame(width:80,height:80)
+    val sizePx: Float = 0f,   // pixels — set after density is known
     val visible: Boolean = true
 )
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MARK: - ReefRescuersGame  (faithful to iOS / AIA logic)
-// Uses mutableStateOf per sprite — Compose observes each independently.
-// Timer-based tick at 60fps mirrors iOS Timer.scheduledTimer(1/60).
-// ─────────────────────────────────────────────────────────────────────────────
-
 class ReefRescuersGame {
-    var score    by mutableIntStateOf(0)
+    var score    by mutableStateOf(0)
     var running  by mutableStateOf(false)
     var gameOver by mutableStateOf(false)
 
-    // Sprites — initial positions match iOS AIA SCM
     var chipsbag        by mutableStateOf(OceanSprite("chips",           visible = false))
     var greenplasticbag by mutableStateOf(OceanSprite("greenplasticbag", visible = true))
     var oldshoes        by mutableStateOf(OceanSprite("oldshoes",        visible = false))
@@ -97,24 +59,34 @@ class ReefRescuersGame {
     var platform        by mutableStateOf(OceanSprite("oceanplatform",   visible = true))
     var recyclingBin    by mutableStateOf(OceanSprite("recyclebin",      visible = true))
 
-    var canvasWidth:  Float = 390f
-    var canvasHeight: Float = 700f
+    var canvasWidth:  Float = 0f
+    var canvasHeight: Float = 0f
 
-    private val platformH = 20f
-    private val binSize   = 110f   // matches iOS 110pt bin width
+    // All sizes in px — set during initCanvas
+    private var spriteSizePx:   Float = 0f   // 80 dp → px
+    private var binSizePx:      Float = 0f   // 110 dp → px
+    private var platformHPx:    Float = 0f   // 20 dp → px
 
-    private val platformY get() = canvasHeight - platformH
-    private val binY      get() = platformY - binSize
+    private val platformY get() = canvasHeight - platformHPx
+    private val binY      get() = platformY - binSizePx
 
-    fun initCanvas(w: Float, h: Float) {
-        canvasWidth  = w
-        canvasHeight = h
-        platform     = platform.copy(x = 0f, y = platformY)
-        recyclingBin = recyclingBin.copy(x = w / 2f - binSize / 2f, y = binY)
+    fun initCanvas(w: Float, h: Float, density: Float) {
+        canvasWidth    = w
+        canvasHeight   = h
+        spriteSizePx   = 80f  * density
+        binSizePx      = 110f * density
+        platformHPx    = 20f  * density
+
+        platform     = platform.copy(x = 0f, y = platformY, sizePx = platformHPx)
+        recyclingBin = recyclingBin.copy(
+            x = w / 2f - binSizePx / 2f,
+            y = binY,
+            sizePx = binSizePx
+        )
     }
 
     fun start() {
-        if (running) return
+        if (running || canvasWidth == 0f) return
         score = 0; gameOver = false; running = true
         spawnAll()
     }
@@ -130,29 +102,30 @@ class ReefRescuersGame {
     fun dragBin(toX: Float) {
         if (!running) return
         recyclingBin = recyclingBin.copy(
-            x = (toX - binSize / 2f).coerceIn(0f, canvasWidth - binSize),
+            x = (toX - binSizePx / 2f).coerceIn(0f, canvasWidth - binSizePx),
             y = binY
         )
     }
 
-    // Called every vsync frame — deltaSeconds keeps speed frame-rate independent
-    // iOS uses 3px per frame @ 60fps = 180px/s
-    fun tick(deltaSeconds: Float) {
+    // 180 dp/s — same as iOS 3px/frame @ 60fps on a ~60dpi canvas
+    // We multiply by density so physical speed matches iOS regardless of screen density
+    fun tick(deltaSeconds: Float, density: Float) {
         if (!running) return
 
-        // Unlock sprites progressively (mirrors iOS score thresholds)
-        if (score > 1  && !chipsbag.visible)     chipsbag     = chipsbag.copy(visible = true)
-        if (score > 8  && !yellowbottle.visible) yellowbottle = yellowbottle.copy(visible = true)
-        if (score > 20 && !oldshoes.visible)     oldshoes     = oldshoes.copy(visible = true)
+        if (score > 1  && !chipsbag.visible)     chipsbag     = chipsbag.copy(visible = true, sizePx = spriteSizePx)
+        if (score > 8  && !yellowbottle.visible) yellowbottle = yellowbottle.copy(visible = true, sizePx = spriteSizePx)
+        if (score > 20 && !oldshoes.visible)     oldshoes     = oldshoes.copy(visible = true, sizePx = spriteSizePx)
 
-        val speed = 180f * deltaSeconds   // 3px/frame @ 60fps
+        val speed = 180f * density * deltaSeconds  // dp/s → px/s
 
-        if (greenplasticbag.visible) greenplasticbag = greenplasticbag.copy(y = greenplasticbag.y + speed)
-        if (chipsbag.visible)        chipsbag        = chipsbag.copy(y = chipsbag.y + speed)
-        if (oldshoes.visible)        oldshoes        = oldshoes.copy(y = oldshoes.y + speed)
-        if (yellowbottle.visible)    yellowbottle    = yellowbottle.copy(y = yellowbottle.y + speed)
-        if (tire.visible)            tire            = tire.copy(y = tire.y + speed)
-        if (fish.visible)            fish            = fish.copy(y = fish.y + speed)
+        fun move(s: OceanSprite) = if (s.visible) s.copy(y = s.y + speed) else s
+
+        greenplasticbag = move(greenplasticbag)
+        chipsbag        = move(chipsbag)
+        oldshoes        = move(oldshoes)
+        yellowbottle    = move(yellowbottle)
+        tire            = move(tire)
+        fish            = move(fish)
 
         platform     = platform.copy(y = platformY)
         recyclingBin = recyclingBin.copy(y = binY)
@@ -167,13 +140,15 @@ class ReefRescuersGame {
 
     private fun hitTest(s: OceanSprite, isFish: Boolean, setter: (OceanSprite) -> Unit) {
         if (!s.visible) return
-        if (s.y + s.size >= platformY) {
+        // Missed — fell past platform
+        if (s.y + s.sizePx >= platformY) {
             setter(respawn(s)); return
         }
+        // Caught in bin
         if (overlaps(s, recyclingBin)) {
             if (isFish) {
                 running = false; gameOver = true
-                setter(s.copy(y = -200f))
+                setter(s.copy(y = -canvasHeight))
             } else {
                 score += 1
                 setter(respawn(s))
@@ -182,33 +157,34 @@ class ReefRescuersGame {
     }
 
     private fun respawn(s: OceanSprite): OceanSprite {
-        val newX = (Math.random() * maxOf(1.0, (canvasWidth - s.size).toDouble())).toFloat()
-        return s.copy(x = newX, y = -s.size)
+        val newX = (Math.random() * maxOf(1.0, (canvasWidth - s.sizePx).toDouble())).toFloat()
+        return s.copy(x = newX, y = -s.sizePx, sizePx = spriteSizePx)
     }
 
     private fun overlaps(a: OceanSprite, b: OceanSprite): Boolean {
         if (!a.visible || !b.visible) return false
-        return a.x < b.x + b.size && a.x + a.size > b.x &&
-               a.y < b.y + b.size && a.y + a.size > b.y
+        return a.x < b.x + b.sizePx && a.x + a.sizePx > b.x &&
+               a.y < b.y + b.sizePx && a.y + a.sizePx > b.y
     }
 
     private fun spawnAll() {
-        greenplasticbag = respawn(greenplasticbag).copy(visible = true)
-        tire            = respawn(tire).copy(visible = true)
-        fish            = respawn(fish).copy(visible = true)
-        chipsbag        = respawn(chipsbag).copy(visible = false)
-        yellowbottle    = respawn(yellowbottle).copy(visible = false)
-        oldshoes        = respawn(oldshoes).copy(visible = false)
-        platform        = platform.copy(x = 0f, y = platformY)
-        recyclingBin    = recyclingBin.copy(x = canvasWidth / 2f - binSize / 2f, y = binY)
+        greenplasticbag = respawn(greenplasticbag.copy(visible = true, sizePx = spriteSizePx))
+        tire            = respawn(tire.copy(visible = true,            sizePx = spriteSizePx))
+        fish            = respawn(fish.copy(visible = true,            sizePx = spriteSizePx))
+        chipsbag        = respawn(chipsbag.copy(visible = false,       sizePx = spriteSizePx))
+        yellowbottle    = respawn(yellowbottle.copy(visible = false,   sizePx = spriteSizePx))
+        oldshoes        = respawn(oldshoes.copy(visible = false,       sizePx = spriteSizePx))
+        platform        = platform.copy(x = 0f, y = platformY, sizePx = platformHPx)
+        recyclingBin    = recyclingBin.copy(
+            x = canvasWidth / 2f - binSizePx / 2f, y = binY, sizePx = binSizePx
+        )
     }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MARK: - OceanInfoScreen
+// OceanInfoScreen
 // ─────────────────────────────────────────────────────────────────────────────
 
-@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 fun OceanInfoScreen(vm: AppStateViewModel) {
     val theme by vm.theme.collectAsState()
@@ -296,20 +272,15 @@ fun OceanInfoScreen(vm: AppStateViewModel) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MARK: - OceanGameScreen  (mirrors iOS OceanGameView exactly)
-// Key fixes vs previous version:
-//   • ignoresSafeArea on the whole screen — no nav bar insets eating canvas height
-//   • Canvas height = total height minus HUD height only
-//   • Platform + bin Y computed from canvas height, not screen height
-//   • navigationBarsPadding on HUD bar so buttons aren't behind Samsung nav bar
+// OceanGameScreen
 // ─────────────────────────────────────────────────────────────────────────────
 
-@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 fun OceanGameScreen(vm: AppStateViewModel) {
     val game = remember { ReefRescuersGame() }
+    val density = LocalDensity.current.density
 
-    // Game loop — mirrors iOS Timer.scheduledTimer(1/60)
+    // Game loop
     LaunchedEffect(game.running) {
         if (!game.running) return@LaunchedEffect
         var lastTime = System.nanoTime()
@@ -318,7 +289,7 @@ fun OceanGameScreen(vm: AppStateViewModel) {
             val now   = System.nanoTime()
             val delta = ((now - lastTime) / 1_000_000_000f).coerceAtMost(0.05f)
             lastTime  = now
-            game.tick(delta)
+            game.tick(delta, density)
         }
     }
 
@@ -330,197 +301,181 @@ fun OceanGameScreen(vm: AppStateViewModel) {
 
     val hudBg = Color(red = 0.03f, green = 0.10f, blue = 0.28f)
 
-    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize()) {
 
-        Column(modifier = Modifier.fillMaxSize()) {
-
-            // ── HUD bar ── mirrors iOS HStack at top
-            // navigationBarsPadding NOT here (it's at bottom) — statusBarsPadding only
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(hudBg)
-                    .statusBarsPadding()
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically
+        // HUD
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(hudBg)
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(
+                onClick = { if (game.running) game.reset() else game.start() },
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.85f)),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                modifier = Modifier.width(80.dp).height(36.dp)
             ) {
-                // Start / Reset button
-                Button(
-                    onClick = { if (game.running) game.reset() else game.start() },
-                    shape = RoundedCornerShape(50),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.85f)),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    modifier = Modifier.width(80.dp).height(36.dp)
-                ) {
-                    Text(
-                        if (game.running) "Reset" else "Start",
-                        fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Black
-                    )
-                }
+                Text(
+                    if (game.running) "Reset" else "Start",
+                    fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Black
+                )
+            }
 
-                Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(1f))
 
-                // Score
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Score", fontSize = 13.sp, fontWeight = FontWeight.Bold,
-                        color = Color.White.copy(alpha = 0.85f))
-                    Text("${game.score}", fontSize = 22.sp, fontWeight = FontWeight.Bold,
-                        color = Color(red = 1f, green = 0.85f, blue = 0f))
-                }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Score", fontSize = 13.sp, fontWeight = FontWeight.Bold,
+                    color = Color.White.copy(alpha = 0.85f))
+                Text("${game.score}", fontSize = 22.sp, fontWeight = FontWeight.Bold,
+                    color = Color(red = 1f, green = 0.85f, blue = 0f))
+            }
 
-                Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(1f))
 
-                // Home button
-                IconButton(onClick = { game.stop(); vm.navigate(Screen.Games) }) {
-                    Icon(Icons.Default.Home, contentDescription = "Home",
-                        tint = Color.White, modifier = Modifier.size(26.dp))
+            IconButton(onClick = { game.stop(); vm.navigate(Screen.Games) }) {
+                Icon(Icons.Default.Home, contentDescription = "Home",
+                    tint = Color.White, modifier = Modifier.size(26.dp))
+            }
+        }
+
+        // Canvas
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .navigationBarsPadding()
+        ) {
+            val canvasW = constraints.maxWidth.toFloat()
+            val canvasH = constraints.maxHeight.toFloat()
+
+            // Init once canvas size is known — passes density so all sizes convert to px
+            LaunchedEffect(canvasW, canvasH) {
+                if (canvasW > 0f && canvasH > 0f) {
+                    game.initCanvas(canvasW, canvasH, density)
                 }
             }
 
-            // ── Canvas ── fills all remaining space above nav bar
-            BoxWithConstraints(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    // Add bottom padding equal to nav bar height so bin is never behind Samsung nav
-                    .navigationBarsPadding()
-            ) {
-                val canvasW = constraints.maxWidth.toFloat()
-                val canvasH = constraints.maxHeight.toFloat()
+            val context = LocalContext.current
+            val oceanResId = remember {
+                context.resources.getIdentifier("ocean", "drawable", context.packageName)
+            }
 
-                // Init canvas once dimensions are known
-                LaunchedEffect(canvasW, canvasH) {
-                    if (canvasW > 0f && canvasH > 0f) {
-                        game.initCanvas(canvasW, canvasH)
-                    }
-                }
-
-                // Ocean background
-                val context = LocalContext.current
-                val oceanResId = remember {
-                    context.resources.getIdentifier("ocean", "drawable", context.packageName)
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color(red = 0.03f, green = 0.25f, blue = 0.60f))
-                ) {
-                    if (oceanResId != 0) {
-                        Image(
-                            painter = painterResource(id = oceanResId),
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-                }
-
-                // Drag surface — full canvas
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .pointerInput(Unit) {
-                            // Track absolute finger position across whole screen
-                            awaitEachGesture {
-                                val down = awaitFirstDown(requireUnconsumed = false)
-                                game.dragBin(down.position.x)
-                                var currentX = down.position.x
-                                var pointerDown = true
-                                while (pointerDown) {
-                                    val event = awaitPointerEvent()
-                                    val drag = event.changes.firstOrNull()
-                                    if (drag != null) {
-                                        currentX = drag.position.x
-                                        game.dragBin(currentX)
-                                        drag.consume()
-                                    }
-                                    pointerDown = event.changes.any { it.pressed }
-                                }
-                            }
-                        }
-                )
-
-                // Platform — full width, 20dp tall, pinned to bottom
-                val platResId = remember {
-                    context.resources.getIdentifier("oceanplatform", "drawable", context.packageName)
-                }
-                if (platResId != 0) {
+            // Background
+            Box(modifier = Modifier.fillMaxSize()
+                .background(Color(red = 0.03f, green = 0.25f, blue = 0.60f))) {
+                if (oceanResId != 0) {
                     Image(
-                        painter = painterResource(id = platResId),
+                        painter = painterResource(id = oceanResId),
                         contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(20.dp)
-                            .align(Alignment.BottomCenter),
-                        contentScale = ContentScale.FillBounds
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
                     )
                 }
+            }
 
-                // Falling sprites
-                SpriteView(game.tire, context)
-                SpriteView(game.chipsbag, context)
-                SpriteView(game.greenplasticbag, context)
-                SpriteView(game.oldshoes, context)
-                SpriteView(game.yellowbottle, context)
-                SpriteView(game.fish, context)
+            // Drag surface
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        awaitEachGesture {
+                            val down = awaitFirstDown(requireUnconsumed = false)
+                            game.dragBin(down.position.x)
+                            var pointerDown = true
+                            while (pointerDown) {
+                                val event = awaitPointerEvent()
+                                val drag = event.changes.firstOrNull()
+                                if (drag != null) {
+                                    game.dragBin(drag.position.x)
+                                    drag.consume()
+                                }
+                                pointerDown = event.changes.any { it.pressed }
+                            }
+                        }
+                    }
+            )
 
-                // Recycling bin
-                BinView(game.recyclingBin, context)
+            // Platform
+            val platResId = remember {
+                context.resources.getIdentifier("oceanplatform", "drawable", context.packageName)
+            }
+            if (platResId != 0) {
+                Image(
+                    painter = painterResource(id = platResId),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(20.dp)
+                        .align(Alignment.BottomCenter),
+                    contentScale = ContentScale.FillBounds
+                )
+            }
 
-                // Game Over overlay
-                if (game.gameOver) {
-                    Box(
-                        modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.55f)),
-                        contentAlignment = Alignment.Center
+            // Sprites — offset in pixels, size in pixels → dp for layout
+            SpriteView(game.tire,            context)
+            SpriteView(game.chipsbag,        context)
+            SpriteView(game.greenplasticbag, context)
+            SpriteView(game.oldshoes,        context)
+            SpriteView(game.yellowbottle,    context)
+            SpriteView(game.fish,            context)
+            BinView(game.recyclingBin,       context)
+
+            // Game Over
+            if (game.gameOver) {
+                Box(modifier = Modifier.fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.55f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(18.dp)
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(18.dp)
-                        ) {
-                            Text("Game Over", fontSize = 36.sp, fontWeight = FontWeight.ExtraBold,
-                                color = Color.White)
-                            Text("Score: ${game.score}", fontSize = 26.sp, fontWeight = FontWeight.Bold,
-                                color = Color(red = 1f, green = 0.85f, blue = 0f))
-                            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                                Button(
-                                    onClick = { game.reset() },
-                                    shape = RoundedCornerShape(14.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(red = 0.08f, green = 0.52f, blue = 0.12f)),
-                                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp)
-                                ) {
-                                    Text("Play Again", fontSize = 18.sp, fontWeight = FontWeight.Bold,
-                                        color = Color.White)
-                                }
-                                Button(
-                                    onClick = { vm.navigate(Screen.Games) },
-                                    shape = RoundedCornerShape(14.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color.Gray.copy(alpha = 0.7f)),
-                                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp)
-                                ) {
-                                    Text("Exit", fontSize = 18.sp, fontWeight = FontWeight.Bold,
-                                        color = Color.White)
-                                }
+                        Text("Game Over", fontSize = 36.sp, fontWeight = FontWeight.ExtraBold,
+                            color = Color.White)
+                        Text("Score: ${game.score}", fontSize = 26.sp, fontWeight = FontWeight.Bold,
+                            color = Color(red = 1f, green = 0.85f, blue = 0f))
+                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                            Button(
+                                onClick = { game.reset() },
+                                shape = RoundedCornerShape(14.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(red = 0.08f, green = 0.52f, blue = 0.12f)),
+                                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp)
+                            ) {
+                                Text("Play Again", fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                                    color = Color.White)
+                            }
+                            Button(
+                                onClick = { vm.navigate(Screen.Games) },
+                                shape = RoundedCornerShape(14.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Gray.copy(alpha = 0.7f)),
+                                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp)
+                            ) {
+                                Text("Exit", fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                                    color = Color.White)
                             }
                         }
                     }
                 }
+            }
 
-                // Start prompt
-                if (!game.running && !game.gameOver) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Button(
-                            onClick = { game.start() },
-                            shape = RoundedCornerShape(22.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Black.copy(alpha = 0.55f)),
-                            contentPadding = PaddingValues(horizontal = 44.dp, vertical = 18.dp)
-                        ) {
-                            Text("Start", fontSize = 28.sp, fontWeight = FontWeight.Bold,
-                                color = Color.White)
-                        }
+            // Start prompt
+            if (!game.running && !game.gameOver) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Button(
+                        onClick = { game.start() },
+                        shape = RoundedCornerShape(22.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Black.copy(alpha = 0.55f)),
+                        contentPadding = PaddingValues(horizontal = 44.dp, vertical = 18.dp)
+                    ) {
+                        Text("Start", fontSize = 28.sp, fontWeight = FontWeight.Bold,
+                            color = Color.White)
                     }
                 }
             }
@@ -529,29 +484,24 @@ fun OceanGameScreen(vm: AppStateViewModel) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MARK: - Sprite composables
+// Sprite composables — sizePx is pixels, convert to dp for Compose layout
 // ─────────────────────────────────────────────────────────────────────────────
 
-@SuppressLint("DiscouragedApi")
 @Composable
-private fun SpriteView(s: OceanSprite, context: Context) {
-    if (!s.visible) return
+private fun BoxScope.SpriteView(s: OceanSprite, context: android.content.Context) {
+    if (!s.visible || s.sizePx == 0f) return
     val resId = remember(s.id) {
         context.resources.getIdentifier(s.id, "drawable", context.packageName)
     }
-    val sizeDp = with(LocalDensity.current) { s.size.toDp() }
+    val sizeDp = with(LocalDensity.current) { s.sizePx.toDp() }
     Box(
         modifier = Modifier
             .offset { IntOffset(s.x.toInt(), s.y.toInt()) }
             .size(sizeDp)
     ) {
         if (resId != 0) {
-            Image(
-                painter = painterResource(id = resId),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit
-            )
+            Image(painter = painterResource(id = resId), contentDescription = null,
+                modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Fit)
         } else {
             Box(modifier = Modifier.fillMaxSize()
                 .background(Color(1f, 0.65f, 0f), RoundedCornerShape(4.dp)))
@@ -559,25 +509,21 @@ private fun SpriteView(s: OceanSprite, context: Context) {
     }
 }
 
-@SuppressLint("DiscouragedApi")
 @Composable
-private fun BinView(s: OceanSprite, context: Context) {
+private fun BoxScope.BinView(s: OceanSprite, context: android.content.Context) {
+    if (s.sizePx == 0f) return
     val resId = remember(s.id) {
         context.resources.getIdentifier(s.id, "drawable", context.packageName)
     }
-    val sizeDp = with(LocalDensity.current) { s.size.toDp() }
+    val sizeDp = with(LocalDensity.current) { s.sizePx.toDp() }
     Box(
         modifier = Modifier
             .offset { IntOffset(s.x.toInt(), s.y.toInt()) }
             .size(sizeDp)
     ) {
         if (resId != 0) {
-            Image(
-                painter = painterResource(id = resId),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit
-            )
+            Image(painter = painterResource(id = resId), contentDescription = null,
+                modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Fit)
         } else {
             Box(modifier = Modifier.fillMaxSize()
                 .background(Color.Green.copy(alpha = 0.8f), RoundedCornerShape(6.dp))) {
