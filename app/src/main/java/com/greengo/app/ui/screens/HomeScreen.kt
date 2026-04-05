@@ -70,6 +70,7 @@ private data class NavTile(
 
 @Composable
 fun HomeScreen(vm: AppStateViewModel) {
+    val ws = rememberWindowSize()
     val theme       by vm.theme.collectAsState()
     val skipMapInfo by vm.skipMapInfo.collectAsState()
     val ws           = rememberWindowSize()
@@ -150,6 +151,7 @@ fun HomeScreen(vm: AppStateViewModel) {
 @SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 private fun HomeHeader(ws: WindowSize) {
+    val ws = rememberWindowSize()
         val context    = LocalContext.current
     val logoResId  = remember {
         context.resources.getIdentifier("greengologocopy", "drawable", context.packageName)
@@ -188,6 +190,7 @@ private fun HomeHeader(ws: WindowSize) {
 @SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 private fun TileCard(tile: NavTile, theme: AppTheme, ws: WindowSize, onClick: () -> Unit) {
+    val ws = rememberWindowSize()
         val context     = LocalContext.current
     val imageResId  = remember(tile.imageName) {
         context.resources.getIdentifier(tile.imageName, "drawable", context.packageName)

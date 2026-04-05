@@ -173,6 +173,7 @@ private suspend fun fetchLanguages(): List<LangEntry> = withContext(Dispatchers.
 
 @Composable
 fun TranslatorScreen(vm: AppStateViewModel) {
+    val ws = rememberWindowSize()
     val ws      = rememberWindowSize()
     val theme   by vm.theme.collectAsState()
     val context     = LocalContext.current
