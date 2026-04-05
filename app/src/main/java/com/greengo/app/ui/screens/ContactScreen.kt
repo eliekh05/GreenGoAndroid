@@ -85,7 +85,7 @@ private suspend fun supabaseSend(replyTo: String, subject: String, message: Stri
                 .build()
             supabaseClient.newCall(request).execute().use { response ->
                 if (response.code == 200) return@withContext null
-                val json = runCatching { JSONObject(response.body?.string() ?: "") }.getOrNull()
+                val json = runCatching { JSONObject(response.body.string() ?: "") }.getOrNull()
                 json?.optString("error")?.takeIf { it.isNotEmpty() }
                     ?: "Server error (${response.code})"
             }

@@ -98,7 +98,7 @@ private suspend fun googleTranslateFree(text: String, targetLang: String): Strin
             .get()
             .build()
         val response = httpClient.newCall(request).execute()
-        val body = response.body?.string() ?: throw Exception("Empty response")
+        val body = response.body.string() ?: throw Exception("Empty response")
         if (!response.isSuccessful) throw Exception("HTTP ${response.code}")
         // Parse: [[["translatedText","originalText",...],...],...]
         val outer = JSONArray(body)
@@ -152,7 +152,7 @@ private suspend fun fetchLanguages(): List<LangEntry> = withContext(Dispatchers.
             .get()
             .build()
         val response = httpClient.newCall(request).execute()
-        val body = response.body?.string() ?: return@withContext emptyList()
+        val body = response.body.string() ?: return@withContext emptyList()
         // Response: {"sl":{...},"tl":{"af":"Afrikaans",...}}
         val obj  = org.json.JSONObject(body)
         val tl   = obj.optJSONObject("tl") ?: return@withContext emptyList()
