@@ -2,14 +2,14 @@
 
 ## Supported Versions
 
-We only maintain security updates for the latest stable release of GreenGo.
+Only maintain security updates for the latest stable release of GreenGo.
 
 | Version | Supported |
 |--------|-----------|
 | Latest release | ✅ Yes |
 | Older versions | ❌ No |
 
-We strongly recommend keeping the app updated to the latest version.
+You are required and obligated keeping the app updated to the latest version.
 
 ---
 
@@ -28,16 +28,16 @@ You may also use GitHub’s private vulnerability reporting feature if available
 
 When a vulnerability is reported:
 
-- We will read and verify the issue
-- If valid, we will investigate and work on a fix
-- We may request additional details if needed
-- Once fixed, an update will be released
+- Will read and verify the issue
+- If valid, will investigate and work on a fix
+- may request additional details if needed
+- Once fixed, an update will be released through automatic build system by GitHub Actions
 
 ---
 
 ## Responsible Disclosure
 
-We kindly ask that you:
+Might ask that you:
 
 - Do not publicly disclose the issue before it is fixed
 - Avoid exploiting the vulnerability beyond what is needed for reporting
