@@ -102,6 +102,7 @@ class WindowSize(
     // ── Grid ─────────────────────────────────────────────────────────────────
 
     // Memory cards — targets ~85 dp per card
+    val gridColumns: Int get() = (widthDp.value / 180f).toInt().coerceIn(1, 6)
     val memoryCardColumns: Int get() = (widthDp.value / 85f).toInt().coerceIn(3, 8)
 
 }
