@@ -78,10 +78,10 @@ private suspend fun supabaseSend(replyTo: String, subject: String, message: Stri
             val body = payload.toString()
                 .toRequestBody("application/json".toMediaType())
             val request = Request.Builder()
-                .url("https://sjsjagoqzjvgsiyejial.supabase.co/functions/v1/send-email")
+                .url("https://ifwtwgjvbtrsyhaxutfv.supabase.co/functions/v1/send-email")
                 .post(body)
                 .addHeader("Content-Type", "application/json")
-                .addHeader("Authorization", "sb_publishable_fbfUw36cqPdExnkaHxxtBw_Kfx9Sj5L")
+                .addHeader("Authorization", "sb_publishable_isKG2lyUokBWoWX25B2Gfw_BVA21zPL")
                 .build()
             supabaseClient.newCall(request).execute().use { response ->
                 if (response.code == 200) return@withContext null
