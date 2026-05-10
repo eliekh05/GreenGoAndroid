@@ -62,12 +62,12 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
-private val supabaseClient = OkHttpClient.Builder()
+private val denoClient = OkHttpClient.Builder()
     .connectTimeout(15, TimeUnit.SECONDS)
     .readTimeout(15, TimeUnit.SECONDS)
     .build()
 
-private suspend fun supabaseSend(replyTo: String, subject: String, message: String): String? =
+private suspend fun denoSend(replyTo: String, subject: String, message: String): String? =
     withContext(Dispatchers.IO) {
         try {
             val payload = JSONObject().apply {
@@ -78,10 +78,9 @@ private suspend fun supabaseSend(replyTo: String, subject: String, message: Stri
             val body = payload.toString()
                 .toRequestBody("application/json".toMediaType())
             val request = Request.Builder()
-                .url("https://ifwtwgjvbtrsyhaxutfv.supabase.co/functions/v1/send-email")
+                .url("https://greengo.greengo.deno.net")
                 .post(body)
                 .addHeader("Content-Type", "application/json")
-                .addHeader("Authorization", "sb_publishable_isKG2lyUokBWoWX25B2Gfw_BVA21zPL")
                 .build()
             supabaseClient.newCall(request).execute().use { response ->
                 if (response.code == 200) return@withContext null
@@ -211,7 +210,7 @@ fun ContactScreen(vm: AppStateViewModel) {
                     val msg     = sanitize(messageText)
                     isSending = true
                     scope.launch {
-                        val err = supabaseSend(from, subject, msg)
+                        val err = denoSend(from, subject, msg)
                         isSending = false
                         if (err != null) {
                             alertMsg = "Could not send your message ($err). Please try again or email $toAddress directly."
