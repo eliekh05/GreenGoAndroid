@@ -82,7 +82,7 @@ private suspend fun denoSend(replyTo: String, subject: String, message: String):
                 .post(body)
                 .addHeader("Content-Type", "application/json")
                 .build()
-            supabaseClient.newCall(request).execute().use { response ->
+            denoClient.newCall(request).execute().use { response ->
                 if (response.code == 200) return@withContext null
                 val json = runCatching { JSONObject(response.body.string()) }.getOrNull()
                 json?.optString("error")?.takeIf { it.isNotEmpty() }
