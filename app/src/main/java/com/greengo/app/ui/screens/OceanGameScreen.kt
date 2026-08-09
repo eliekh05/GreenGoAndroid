@@ -60,6 +60,9 @@ class ReefRescuersGame {
     var platform        by mutableStateOf(OceanSprite("oceanplatform",   visible = true))
     var recyclingBin    by mutableStateOf(OceanSprite("recyclebin",      visible = true))
 
+    // Elapsed gameplay seconds — used to ramp up speed over time
+    var gameTime: Float = 0f
+
     var canvasWidth:  Float = 0f
     var canvasHeight: Float = 0f
 
@@ -88,12 +91,12 @@ class ReefRescuersGame {
 
     fun start() {
         if (running || canvasWidth == 0f) return
-        score = 0; gameOver = false; running = true
+        score = 0; gameOver = false; gameTime = 0f; gameTime = 0f; running = true
         spawnAll()
     }
 
     fun reset() {
-        score = 0; gameOver = false
+        score = 0; gameOver = false; gameTime = 0f
         spawnAll()
         running = true
     }
@@ -113,11 +116,22 @@ class ReefRescuersGame {
     fun tick(deltaSeconds: Float, density: Float) {
         if (!running) return
 
+        // Accumulate elapsed time
+        gameTime += deltaSeconds
+
         if (score > 1  && !chipsbag.visible)     chipsbag     = chipsbag.copy(visible = true, sizePx = spriteSizePx)
         if (score > 8  && !yellowbottle.visible) yellowbottle = yellowbottle.copy(visible = true, sizePx = spriteSizePx)
         if (score > 20 && !oldshoes.visible)     oldshoes     = oldshoes.copy(visible = true, sizePx = spriteSizePx)
 
-        val speed = 180f * density * deltaSeconds  // dp/s → px/s
+        // Speed ramps from 180 dp/s at start → up to 480 dp/s over 90 seconds.
+        // Formula: base + (max-base) × (1 - e^(-time/tau))
+        // Curve feels natural — quick early gain, plateaus at the cap.
+        // tau=30 → reaches ~63% of cap by 30s, ~86% by 60s, ~95% by 90s.
+        val baseSpeed = 180f   // dp/s at game start
+        val maxSpeed  = 480f   // dp/s hard cap (2.67× faster than start)
+        val tau       = 30f    // time constant in seconds
+        val dpPerSec  = baseSpeed + (maxSpeed - baseSpeed) * (1f - Math.exp((-gameTime / tau).toDouble()).toFloat())
+        val speed     = dpPerSec * density * deltaSeconds  // dp/s → px/frame
 
         fun move(s: OceanSprite) = if (s.visible) s.copy(y = s.y + speed) else s
 
