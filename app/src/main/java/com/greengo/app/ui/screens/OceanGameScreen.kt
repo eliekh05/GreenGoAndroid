@@ -89,7 +89,7 @@ class ReefRescuersGame {
 
     fun start() {
         if (running || canvasWidth == 0f) return
-        score = 0; gameOver = false; gameTime = 0f; running = true
+        score = 0; gameOver = false; running = true
         spawnAll()
     }
 
