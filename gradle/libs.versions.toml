@@ -5,7 +5,7 @@ activityKtx      = "1.13.0"
 composeBom       = "2026.06.01"
 okhttp           = "5.4.0"
 osmdroid         = "6.1.20"
-media3           = "1.10.1"
+media3           = "1.11.0"
 
 [libraries]
 androidx-activity-ktx      = { group = "androidx.activity",          name = "activity-ktx",           version.ref = "activityKtx" }
