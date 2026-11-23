@@ -2,7 +2,7 @@
 agp              = "9.5.1"
 kotlin           = "2.4.21"
 activityKtx      = "1.13.0"
-composeBom       = "2026.09.00"
+composeBom       = "2026.11.01"
 okhttp           = "5.5.1"
 osmdroid         = "6.1.20"
 media3           = "1.11.1"
